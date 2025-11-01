@@ -1,14 +1,14 @@
 import { images } from '@/constants';
+import { Ionicons } from '@expo/vector-icons';
 import React from 'react';
 import {
     Image,
+    ScrollView,
     Text,
     TextInput,
-    View,
     TouchableOpacity,
-    ScrollView,
+    View,
 } from 'react-native';
-import { Ionicons } from '@expo/vector-icons';
 
 const SignInScreen = () => {
     return (
@@ -17,7 +17,7 @@ const SignInScreen = () => {
           className="bg-white flex-grow"
       >
           {/* Logo */}
-          <View className="mt-10 w-40 h-20">
+            <View className="mt-16 w-60 h-20">
               <Image
                   source={images.Logo}
                   className="w-full h-full"
@@ -26,13 +26,13 @@ const SignInScreen = () => {
           </View>
 
           {/* Headings */}
-          <Text className="text-3xl font-bold text-[#475569] mt-2">
+            <Text className="text-3xl font-bold text-[#475569] mt-5">
               Welcome Back
           </Text>
           <Text className="text-[#64748B] mt-1 mb-10">Login to your account</Text>
 
           {/* Inputs */}
-          <View className="w-full gap-5">
+            <View className="w-full gap-5 mt-5">
               <View>
                   <Text className="mb-2 font-semibold text-[#64748B]">
                       Enter Email / Phone Number
@@ -71,7 +71,7 @@ const SignInScreen = () => {
           </View>
 
           {/* Sign In Button */}
-          <TouchableOpacity className="bg-[#2563EB] w-full p-4 rounded-lg mt-6">
+            <TouchableOpacity className="bg-[#2563EB] w-full p-4 rounded-lg mt-10">
               <Text className="text-white text-center text-lg font-semibold">
                   Sign In
               </Text>
@@ -97,7 +97,7 @@ const SignInScreen = () => {
               <TouchableOpacity className="flex-1 flex-row items-center justify-center border border-[#D4D3D3] p-3 rounded-lg mr-2">
                   <Image
                       source={{
-                          uri: 'https://upload.wikimedia.org/wikipedia/commons/0/09/Google_Icon.png',
+                            uri: 'https://img.icons8.com/?size=100&id=V5cGWnc9R4xj&format=png&color=000000',
                       }}
                       className="w-5 h-5 mr-2"
                       resizeMode="contain"
