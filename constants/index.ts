@@ -7,6 +7,7 @@ import FullService from "../assets/images/full-service.png";
 import ReceiveParcel from "../assets/images/receive-parcel.png";
 import Logo from "../assets/images/splash-icon.png";
 import CarBannerOne from "../assets/images/Car-banner 1.png";
+import SliderArrow from "../assets/icons/slider-arrow.png";
 
 export const images = {
   AuthWelcome,
@@ -19,4 +20,5 @@ export const images = {
   location,
   Menu,
   CarBannerOne,
+  SliderArrow,
 };

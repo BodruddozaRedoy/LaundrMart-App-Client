@@ -1,5 +1,7 @@
+import SlideToOrder from "@/components/common/SlideToOrder";
 import { images } from "@/constants";
 import { Ionicons } from "@expo/vector-icons";
+import { router } from "expo-router";
 import React, { useState } from "react";
 import {
   Image,
@@ -142,6 +144,7 @@ export default function HomeScreen() {
           </View>
         </TouchableOpacity>
       </View>
+      <SlideToOrder onSlideComplete={() => router.push("/order/placeOrder")} />
     </ScrollView>
   );
 }
