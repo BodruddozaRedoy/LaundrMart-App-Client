@@ -26,7 +26,7 @@ const SlideToOrder: React.FC<SlideToOrderProps> = ({ onSlideComplete }) => {
             translateX.value = Math.min(Math.max(0, event.translationX), maxSlide);
         })
         .onEnd(() => {
-            if (translateX.value > maxSlide * 0.8) {
+            if (translateX.value > maxSlide * 0.7) {
                 translateX.value = withSpring(maxSlide);
                 if (onSlideComplete) {
                     runOnJS(onSlideComplete)();
