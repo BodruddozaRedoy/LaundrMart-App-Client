@@ -29,7 +29,7 @@ const PickupNowScreen = () => {
                         </View>
                         {/* Badge */}
                         <View className="bg-[#E5F3FF] rounded-full px-3 py-1">
-                            <Text className="text-[#017FC6] text-xs font-semibold">
+                            <Text className="text-[#017FC6] text-xs font-semibold text-wrap">
                                 Current Location
                             </Text>
                         </View>

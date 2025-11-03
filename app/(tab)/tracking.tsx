@@ -3,11 +3,11 @@ import { Ionicons } from "@expo/vector-icons";
 import { router } from "expo-router";
 import React, { useState } from "react";
 import {
-  View,
+  FlatList,
+  StatusBar,
   Text,
   TouchableOpacity,
-  FlatList,
-  ScrollView,
+  View
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
@@ -58,6 +58,7 @@ export default function TrackingScreen() {
 
   return (
     <SafeAreaView className="flex-1 bg-white">
+      <StatusBar barStyle={"dark-content"} />
       {/* ✅ Header */}
       <View className="flex-row items-center justify-between px-5 py-3 border-b border-[#E2E8F0]">
         <Text className="text-xl font-bold text-[#1E293B]">

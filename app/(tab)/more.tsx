@@ -1,7 +1,7 @@
 import { Ionicons } from "@expo/vector-icons";
 import { router } from "expo-router";
 import React from "react";
-import { Image, ScrollView, Text, TouchableOpacity, View } from "react-native";
+import { Image, ScrollView, StatusBar, Text, TouchableOpacity, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
 const MoreScreen = () => {
@@ -13,16 +13,17 @@ const MoreScreen = () => {
         { id: 5, icon: "information-circle-outline", title: "Terms & Conditions", link: "/more/termsConditions" },
         { id: 6, icon: "information-circle-outline", title: "Laundry Protection", link: "/more/laundryProtection" },
         { id: 7, icon: "help-circle-outline", title: "FAQ", link: "/more/faq" },
-        { id: 8, icon: "log-out-outline", title: "Log Out", link: "/more/profileInfo" },
+        { id: 8, icon: "log-out-outline", title: "Log Out", link: "/welcome" },
     ];
 
     return (
         <SafeAreaView className="flex-1 bg-white">
+            <StatusBar barStyle={"dark-content"} />
             {/* Header Section */}
             <View className="items-center mt-10 mb-4">
                 <View className="w-11/12 bg-white shadow-sm border border-primary rounded-2xl p-4 flex-row items-center">
                     <Image
-                        source={{ uri: "https://i.pravatar.cc/100" }}
+                        source={{ uri: "https://t4.ftcdn.net/jpg/00/91/13/83/360_F_91138343_2rGUY65Ew7OAkYZ12sltkN0e1ngO9Vx2.jpg" }}
                         className="w-16 h-16 rounded-full mr-4"
                     />
                     <View className="flex-1">

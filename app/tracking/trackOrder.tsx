@@ -5,6 +5,7 @@ import React from "react";
 import {
   Image,
   ScrollView,
+  StatusBar,
   Text,
   TouchableOpacity,
   View,
@@ -22,9 +23,10 @@ export default function TrackOrderScreen() {
 
   return (
     <SafeAreaView className="flex-1 bg-white">
+      <StatusBar barStyle={"dark-content"} />
       {/* Header */}
       <View className="flex-row items-center justify-between px-5 py-3 border-b border-[#E2E8F0]">
-        <TouchableOpacity onPress={() => router.back()}>
+        <TouchableOpacity onPress={() => router.push("/(tab)/tracking")}>
           <Ionicons name="arrow-back-outline" size={22} color="#1E293B" />
         </TouchableOpacity>
         <Text className="text-lg font-semibold text-[#1E293B]">Track Order</Text>

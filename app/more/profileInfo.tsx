@@ -36,7 +36,7 @@ const PersonalInfoScreen = () => {
                 <View className="items-center mb-6">
                     <View className="relative">
                         <Image
-                            source={{ uri: "https://i.pravatar.cc/100" }}
+                                source={{ uri: "https://t4.ftcdn.net/jpg/00/91/13/83/360_F_91138343_2rGUY65Ew7OAkYZ12sltkN0e1ngO9Vx2.jpg" }}
                             className="w-24 h-24 rounded-full"
                         />
                         <TouchableOpacity className="absolute bottom-0 right-0 bg-gray-100 p-1.5 rounded-full">
