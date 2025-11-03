@@ -1,7 +1,7 @@
 import PrimaryButton from "@/components/shared/PrimaryButton";
 import { laundries } from "@/constants";
 import { Ionicons } from "@expo/vector-icons";
-import { useLocalSearchParams } from "expo-router";
+import { router, useLocalSearchParams } from "expo-router";
 import React from "react";
 import { Image, ScrollView, Text, TouchableOpacity, View } from "react-native";
 
@@ -117,7 +117,7 @@ export default function ReviewOrderScreen() {
 
       {/* Continue Button */}
       <View className="absolute bottom-10 left-5 right-5">
-        <TouchableOpacity className="w-full">
+              <TouchableOpacity onPress={() => router.push({ pathname: "/order/orderConfirm" })} className="w-full">
           <PrimaryButton text="Confirm Order"/>
         </TouchableOpacity>
       </View>
