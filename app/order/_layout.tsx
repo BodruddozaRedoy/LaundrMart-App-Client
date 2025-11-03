@@ -25,7 +25,7 @@ export default function OrderLayout() {
 
     // ❌ Hide header only for the main /order route
     const hideHeader =
-        currentSegment === "orderConfirm" || currentSegment === "index";
+        currentSegment === "orderConfirm"
 
     return (
         <Stack
