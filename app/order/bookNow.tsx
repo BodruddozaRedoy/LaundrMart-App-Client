@@ -2,7 +2,7 @@ import InfoAlert from "@/components/shared/InfoAlert";
 import PrimaryButton from "@/components/shared/PrimaryButton";
 import { laundries } from "@/constants";
 import { Ionicons } from "@expo/vector-icons";
-import { useLocalSearchParams } from "expo-router";
+import { router, useLocalSearchParams } from "expo-router";
 import React, { useState } from "react";
 import {
     Image,
@@ -224,8 +224,8 @@ export default function BookNowScreen() {
 
             {/* Continue Button */}
             <View className="absolute bottom-10 left-5 right-5">
-                <TouchableOpacity className="w-full">
-                    <PrimaryButton text="Continue" />
+                <TouchableOpacity onPress={() => router.push({ pathname: "/order/reviewOrder", params: { id: laundry?.id } })} className="w-full">
+                    <PrimaryButton text="Order Now" />
                 </TouchableOpacity>
             </View>
 

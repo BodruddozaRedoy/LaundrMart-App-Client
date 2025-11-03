@@ -15,6 +15,7 @@ export default function OrderLayout() {
         "chooseLaundryMart": "Choose Laundry Mart",
         "laundryDetails": "Laundry Details",
         "bookNow": "Book Now",
+        "reviewOrder": "Review Order",
     };
 
     const currentSegment = segments[segments.length - 1];
