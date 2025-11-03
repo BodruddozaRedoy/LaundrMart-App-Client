@@ -37,7 +37,7 @@ export default function TrackOrderScreen() {
         contentContainerStyle={{ paddingBottom: 100 }}
       >
         {/* Report Details */}
-        <View className="bg-[#F1F5F9] rounded-2xl p-4 mt-5">
+        <View className="bg-primary/10 border-primary border rounded-2xl p-4 mt-5">
           <Text className="text-base font-semibold text-[#1E293B] mb-1">
             {order.report.title}
           </Text>
@@ -111,7 +111,7 @@ export default function TrackOrderScreen() {
         </View>
 
         {/* Order Progress */}
-        <View className="mt-6">
+        <View className="mt-6 bg-[#F8FAFC] border border-[#E2E8F0] rounded-2xl p-4">
           {order.messages.map((step, index) => {
             const isCompleted = index === 0; // highlight first one
             return (
