@@ -1,10 +1,16 @@
 import PrimaryButton from "@/components/shared/PrimaryButton";
 import { Ionicons } from "@expo/vector-icons";
-import { router } from "expo-router";
+import { router, useLocalSearchParams } from "expo-router";
 import React, { useState } from "react";
 import { Text, TouchableOpacity, View } from "react-native";
 
 const PickupNowScreen = () => {
+    const { latitude, longitude, currentAddress } = useLocalSearchParams<{
+        latitude: string;
+        longitude: string;
+        currentAddress: string;
+    }>();
+    console.log(currentAddress)
     const [address, setAddress] = useState("")
 
     return (
