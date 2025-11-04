@@ -1,8 +1,9 @@
 import PrimaryButton from "@/components/shared/PrimaryButton";
 import { Ionicons } from "@expo/vector-icons";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 import { router, useLocalSearchParams } from "expo-router";
-import React, { useState } from "react";
-import { Text, TouchableOpacity, View } from "react-native";
+import React, { useEffect, useState } from "react";
+import { FlatList, Text, TouchableOpacity, View } from "react-native";
 
 const PickupNowScreen = () => {
     const { latitude, longitude, currentAddress } = useLocalSearchParams<{
@@ -10,53 +11,99 @@ const PickupNowScreen = () => {
         longitude: string;
         currentAddress: string;
     }>();
-    console.log(currentAddress)
-    const [address, setAddress] = useState("")
+
+    const [addresses, setAddresses] = useState<any[]>([]);
+    const [selectedAddress, setSelectedAddress] = useState<any>(null);
+
+    useEffect(() => {
+        const loadAddresses = async () => {
+            const saved = await AsyncStorage.getItem("savedAddresses");
+            if (saved) {
+                const parsed = JSON.parse(saved);
+                setAddresses(parsed);
+            }
+        };
+        loadAddresses();
+    }, []);
+
+    const handleSelect = (addr: any) => {
+        setSelectedAddress(addr);
+    };
+
+    const handleContinue = () => {
+        if (!selectedAddress) return;
+        router.push({
+            pathname: "/order/chooseLaundryMart",
+            params: {
+                latitude: selectedAddress.latitude.toString(),
+                longitude: selectedAddress.longitude.toString(),
+                currentAddress: selectedAddress.currentAddress,
+            },
+        });
+    };
 
     return (
         <View className="flex-1 bg-white px-5 pt-5">
-            {/* Section Title */}
-            <Text className="text-2xl font-bold text-black">Your Location</Text>
+            <Text className="text-2xl font-bold text-black">Your Locations</Text>
             <Text className="text-md text-gray-500 mt-1 mb-5">
                 Where should we pick up your laundry?
             </Text>
 
-            {/* Address Card */}
-            <TouchableOpacity onPress={() => setAddress("home")} className={`flex-row justify-between items-center border border-gray-200 rounded-2xl p-4 bg-white shadow-sm ${address === "home" && 'border-primary'}`}>
-                {/* Left Side */}
-                <View className=" flex-1 space-x-3">
-                    <View className="flex-row">
-                        <Ionicons name="location-outline" size={22} color="#017FC6" />
+            {/* Saved Addresses */}
+            <FlatList
+                data={addresses}
+                keyExtractor={(item) => item.id}
+                renderItem={({ item }) => (
+                    <TouchableOpacity
+                        onPress={() => handleSelect(item)}
+                        className={`flex-row justify-between items-center border rounded-2xl p-4 mb-3 ${selectedAddress?.id === item.id
+                            ? "border-[#017FC6] bg-[#E5F3FF]"
+                            : "border-gray-200 bg-white"
+                            }`}
+                    >
                         <View className="flex-1 ml-2">
                             <Text className="text-lg font-semibold text-black">
-                                Home Address
+                                {item.label}
                             </Text>
-
-                        </View>
-                        {/* Badge */}
-                        <View className="bg-[#E5F3FF] rounded-full px-3 py-1">
-                            <Text className="text-[#017FC6] text-xs font-semibold text-wrap">
-                                Current Location
+                            <Text className="text-md text-gray-600 mt-1">
+                                {item.currentAddress}
                             </Text>
                         </View>
-                    </View>
-                    <Text className="text-md text-gray-600 mt-1">
-                        123 Main St, San Francisco, CA 94102
+                        {selectedAddress?.id === item.id && (
+                            <Ionicons name="checkmark-circle" size={24} color="#017FC6" />
+                        )}
+                    </TouchableOpacity>
+                )}
+                ListEmptyComponent={
+                    <Text className="text-gray-500 text-center mt-10">
+                        No saved addresses yet.
                     </Text>
-                </View>
-            </TouchableOpacity>
+                }
+                ListFooterComponent={() => (
+                    <TouchableOpacity
+                        onPress={() => router.push("/order/addNewAddress")}
+                        className="flex-row items-center justify-center mt-6 h-12 bg-gray-50 rounded-xl border border-gray-200"
+                    >
+                        <Ionicons name="add-circle-outline" size={20} color="#017FC6" />
+                        <Text className="text-[#017FC6] font-medium text-sm ml-2">
+                            Add New Address
+                        </Text>
+                    </TouchableOpacity>
+                )}
+            />
 
-            {/* Add New Address */}
-            <TouchableOpacity onPress={() => router.push("/order/addNewAddress")} className="flex-row items-center justify-center mt-6 h-12 bg-gray-50 rounded-xl border border-gray-200">
-                <Ionicons name="add-circle-outline" size={20} color="#017FC6" />
-                <Text className="text-[#017FC6] font-medium text-sm ml-2">
-                    Add New Address
-                </Text>
-            </TouchableOpacity>
+
 
             {/* Continue Button */}
-            <TouchableOpacity onPress={() => router.push("/order/chooseLaundryMart")} className="w-full absolute bottom-10 right-5 left-5">
-                <PrimaryButton text="Continue" />
+            <TouchableOpacity
+                onPress={() => router.push("/order/chooseLaundryMart")}
+                disabled={!selectedAddress}
+                className="w-full absolute bottom-10 right-5 left-5 opacity-100"
+            >
+                <PrimaryButton
+                    text="Continue"
+                //   disabled={!selectedAddress}
+                />
             </TouchableOpacity>
         </View>
     );

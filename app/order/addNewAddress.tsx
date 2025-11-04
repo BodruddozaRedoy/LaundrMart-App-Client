@@ -1,3 +1,4 @@
+import AsyncStorage from "@react-native-async-storage/async-storage";
 import * as Location from "expo-location";
 import { useRouter } from "expo-router";
 import React, { useEffect, useState } from "react";
@@ -5,9 +6,11 @@ import {
     ActivityIndicator,
     Alert,
     Dimensions,
+    Modal,
     Text,
+    TextInput,
     TouchableOpacity,
-    View,
+    View
 } from "react-native";
 import { WebView } from "react-native-webview";
 
@@ -23,6 +26,11 @@ export default function AddNewAddress() {
     } | null>(null);
     const [loading, setLoading] = useState(true);
 
+    // Modal state
+    const [modalVisible, setModalVisible] = useState(false);
+    const [addressType, setAddressType] = useState("Home");
+    const [customLabel, setCustomLabel] = useState("");
+
     useEffect(() => {
         const fetchLocation = async () => {
             try {
@@ -33,7 +41,7 @@ export default function AddNewAddress() {
                         "Please enable location services to use this feature."
                     );
                     setRegion({
-                        latitude: 23.8103, // Dhaka fallback
+                        latitude: 23.8103,
                         longitude: 90.4125,
                         latitudeDelta: 0.05,
                         longitudeDelta: 0.05 * (width / height),
@@ -112,21 +120,70 @@ export default function AddNewAddress() {
                     .join(", ") ||
                 `${region.latitude.toFixed(6)}, ${region.longitude.toFixed(6)}`;
 
-            router.push({
-                pathname: "/order/pickupAddress",
-                params: {
-                    latitude: region.latitude.toString(),
-                    longitude: region.longitude.toString(),
+            // instead of redirecting, open modal
+            setModalVisible(true);
+
+            // temporarily store address for saving
+            await AsyncStorage.setItem(
+                "pendingAddress",
+                JSON.stringify({
+                    latitude: region.latitude,
+                    longitude: region.longitude,
                     currentAddress: address,
-                },
-            });
+                })
+            );
         } catch (error) {
             console.error("Reverse geocode error:", error);
             Alert.alert("Error", "Unable to retrieve address for this location.");
         }
     };
 
-    // Leaflet + OpenStreetMap HTML
+    const handleAddAddress = async () => {
+        try {
+            const pending = await AsyncStorage.getItem("pendingAddress");
+            if (!pending) return;
+
+            const addressData = JSON.parse(pending);
+            const label =
+                addressType === "Custom" && customLabel.trim() !== ""
+                    ? customLabel.trim()
+                    : addressType;
+
+            const finalAddress = {
+                ...addressData,
+                label,
+                id: Date.now().toString(), // unique ID for each address
+            };
+
+            // Fetch existing addresses
+            const existing = await AsyncStorage.getItem("savedAddresses");
+            const addresses = existing ? JSON.parse(existing) : [];
+
+            // Add new one
+            addresses.push(finalAddress);
+
+            // Save updated array
+            await AsyncStorage.setItem("savedAddresses", JSON.stringify(addresses));
+
+            // Clean up
+            await AsyncStorage.removeItem("pendingAddress");
+            setModalVisible(false);
+
+    // Navigate
+            router.push({
+                pathname: "/order/pickupAddress",
+                params: {
+                    latitude: addressData.latitude.toString(),
+                    longitude: addressData.longitude.toString(),
+                    currentAddress: addressData.currentAddress,
+                },
+            });
+        } catch (e) {
+            console.error("Save error:", e);
+        }
+    };
+
+
     const mapHTML = region
         ? `
       <!DOCTYPE html>
@@ -176,9 +233,9 @@ export default function AddNewAddress() {
                     onPress={() => router.replace("/order/pickupAddress")}
                     className="mt-4 bg-[#017FC6] px-5 py-2 rounded-lg"
                 >
-                  <Text className="text-white font-semibold">Retry</Text>
-              </TouchableOpacity>
-          </View>
+                    <Text className="text-white font-semibold">Retry</Text>
+                </TouchableOpacity>
+            </View>
         );
     }
 
@@ -186,30 +243,91 @@ export default function AddNewAddress() {
         <View className="flex-1 bg-white">
             <WebView
                 originWhitelist={["*"]}
-                javaScriptEnabled={true}
-                domStorageEnabled={true}
-                allowFileAccess={true}
-                allowUniversalAccessFromFileURLs={true}
+                javaScriptEnabled
+                domStorageEnabled
+                allowFileAccess
+                allowUniversalAccessFromFileURLs
                 source={{ html: mapHTML }}
                 style={{ flex: 1 }}
             />
 
-          {/* Bottom Buttons */}
-          <View className="flex-row items-center justify-between px-5 pb-5 bg-white my-10">
+            {/* Bottom Buttons */}
+            <View className="flex-row items-center justify-between px-5 pb-5 bg-white my-10">
                 <TouchableOpacity
                     onPress={() => router.back()}
                     className="flex-1 mr-2 bg-gray-100 h-12 rounded-xl items-center justify-center"
                 >
-                  <Text className="text-gray-700 font-semibold text-base">Cancel</Text>
-              </TouchableOpacity>
+                    <Text className="text-gray-700 font-semibold text-base">Cancel</Text>
+                </TouchableOpacity>
 
                 <TouchableOpacity
                     onPress={handleConfirm}
                     className="flex-1 ml-2 bg-[#017FC6] h-12 rounded-xl items-center justify-center"
                 >
-                  <Text className="text-white font-semibold text-base">Confirm</Text>
-              </TouchableOpacity>
-          </View>
-    </View>
-  );
+                    <Text className="text-white font-semibold text-base">Confirm</Text>
+                </TouchableOpacity>
+            </View>
+
+            {/* Slide-up Modal */}
+            <Modal
+                visible={modalVisible}
+                animationType="slide"
+                transparent
+                onRequestClose={() => setModalVisible(false)}
+            >
+                <View
+                    style={{
+                        flex: 1,
+                        justifyContent: "flex-end",
+                        backgroundColor: "rgba(0,0,0,0.3)",
+                    }}
+                >
+                    <View
+                        style={{
+                            backgroundColor: "#fff",
+                            borderTopLeftRadius: 20,
+                            borderTopRightRadius: 20,
+                            padding: 20,
+                        }}
+                    >
+                        <Text className="text-xl font-bold mb-4">Set Address Label</Text>
+
+                        {["Home", "Work", "Custom"].map((item) => (
+                            <TouchableOpacity
+                                key={item}
+                                onPress={() => setAddressType(item)}
+                                className={`p-3 border mb-3 rounded-xl ${addressType === item ? "border-[#017FC6]" : "border-gray-200"
+                                    }`}
+                            >
+                                <Text
+                                    className={`text-base ${addressType === item
+                                        ? "text-[#017FC6] font-semibold"
+                                        : "text-gray-700"
+                                        }`}
+                                >
+                                    {item}
+                                </Text>
+                            </TouchableOpacity>
+                        ))}
+
+                        {addressType === "Custom" && (
+                            <TextInput
+                                placeholder="Enter label (e.g. Parents’ House)"
+                                value={customLabel}
+                                onChangeText={setCustomLabel}
+                                className="border border-gray-300 rounded-lg px-3 py-2 mb-3"
+                            />
+                        )}
+
+                        <TouchableOpacity
+                            onPress={handleAddAddress}
+                            className="bg-[#017FC6] py-3 rounded-xl items-center justify-center"
+                        >
+                            <Text className="text-white font-semibold text-base">Add</Text>
+                        </TouchableOpacity>
+                    </View>
+                </View>
+            </Modal>
+        </View>
+    );
 }
