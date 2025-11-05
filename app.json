@@ -11,6 +11,10 @@
 
     "ios": {
       "supportsTablet": true,
+      "bundleIdentifier": "com.bodruddozaredoy.LaundrMart",
+      "config": {
+        "googleMapsApiKey": "AIzaSyAhFoKGMZZhjsoZEaFaTh-S0AWqNxtq69o"
+      },
       "infoPlist": {
         "NSLocationWhenInUseUsageDescription": "LaundrMart needs access to your location to show nearby pickup addresses and help you find laundry services.",
         "NSLocationAlwaysAndWhenInUseUsageDescription": "LaundrMart needs access to your location to provide location-based services."
@@ -26,7 +30,12 @@
       },
       "edgeToEdgeEnabled": true,
       "predictiveBackGestureEnabled": false,
-      "package": "com.bodruddozaredoy.LaundrMart"
+      "package": "com.bodruddozaredoy.LaundrMart",
+      "config": {
+        "googleMaps": {
+          "apiKey": "AIzaSyAhFoKGMZZhjsoZEaFaTh-S0AWqNxtq69o"
+        }
+      }
     },
 
     "web": {
@@ -57,6 +66,7 @@
           "locationWhenInUsePermission": "Allow LaundrMart to use your location to show nearby pickup addresses."
         }
       ]
+      // "react-native-maps"
     ],
 
     "experiments": {

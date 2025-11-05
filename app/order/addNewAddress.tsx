@@ -1,3 +1,4 @@
+// app/order/add-new-address.tsx (or your path)
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import * as Location from "expo-location";
 import { useRouter } from "expo-router";
@@ -7,28 +8,22 @@ import {
     Alert,
     Dimensions,
     Modal,
+    Platform,
     Text,
     TextInput,
     TouchableOpacity,
-    View
+    View,
 } from "react-native";
-import { WebView } from "react-native-webview";
+import MapView, { Marker, PROVIDER_GOOGLE, Region } from "react-native-maps";
 
 const { width, height } = Dimensions.get("window");
 
 export default function AddNewAddress() {
     const router = useRouter();
-    const [region, setRegion] = useState<{
-        latitude: number;
-        longitude: number;
-        latitudeDelta: number;
-        longitudeDelta: number;
-    } | null>(null);
+    const [region, setRegion] = useState<Region | null>(null);
     const [loading, setLoading] = useState(true);
-
-    // Modal state
     const [modalVisible, setModalVisible] = useState(false);
-    const [addressType, setAddressType] = useState("Home");
+    const [addressType, setAddressType] = useState<"Home" | "Work" | "Custom">("Home");
     const [customLabel, setCustomLabel] = useState("");
 
     useEffect(() => {
@@ -36,71 +31,53 @@ export default function AddNewAddress() {
             try {
                 const servicesEnabled = await Location.hasServicesEnabledAsync();
                 if (!servicesEnabled) {
-                    Alert.alert(
-                        "Location Services Disabled",
-                        "Please enable location services to use this feature."
-                    );
-                    setRegion({
-                        latitude: 23.8103,
-                        longitude: 90.4125,
-                        latitudeDelta: 0.05,
-                        longitudeDelta: 0.05 * (width / height),
-                    });
-                    setLoading(false);
-                    return;
-                }
+            Alert.alert("Location Services Disabled", "Please enable location services.");
+            setRegion({
+                latitude: 23.8103,
+                longitude: 90.4125,
+                latitudeDelta: 0.05,
+                longitudeDelta: 0.05 * (width / height),
+            });
+            return;
+        }
 
-                const { status } = await Location.requestForegroundPermissionsAsync();
-                if (status !== "granted") {
-                    Alert.alert(
-                        "Permission Denied",
-                        "We need location permission to show your current address."
-                    );
-                    setRegion({
-                        latitude: 23.8103,
-                        longitude: 90.4125,
-                        latitudeDelta: 0.05,
-                        longitudeDelta: 0.05 * (width / height),
-                    });
-                    setLoading(false);
-                    return;
-                }
+          const { status } = await Location.requestForegroundPermissionsAsync();
+          if (status !== "granted") {
+            Alert.alert("Permission Denied", "We need location permission.");
+            setRegion({
+                latitude: 23.8103,
+                longitude: 90.4125,
+                latitudeDelta: 0.05,
+                longitudeDelta: 0.05 * (width / height),
+            });
+            return;
+        }
 
-                const loc = await Location.getCurrentPositionAsync({
-                    accuracy: Location.Accuracy.High,
-                    mayShowUserSettingsDialog: true,
-                });
+          const loc = await Location.getCurrentPositionAsync({
+              accuracy: Location.Accuracy.High,
+        });
 
-                if (loc?.coords?.latitude && loc?.coords?.longitude) {
-                    setRegion({
-                        latitude: loc.coords.latitude,
-                        longitude: loc.coords.longitude,
-                        latitudeDelta: 0.05,
-                        longitudeDelta: 0.05 * (width / height),
-                    });
-                } else {
-                    setRegion({
-                        latitude: 23.8103,
-                        longitude: 90.4125,
-                        latitudeDelta: 0.05,
-                        longitudeDelta: 0.05 * (width / height),
-                    });
-                }
-            } catch (error) {
-                console.error("Location error:", error);
-                setRegion({
-                    latitude: 23.8103,
-                    longitude: 90.4125,
-                    latitudeDelta: 0.05,
-                    longitudeDelta: 0.05 * (width / height),
-                });
-            } finally {
-                setLoading(false);
-            }
-        };
+          setRegion({
+              latitude: loc.coords.latitude,
+              longitude: loc.coords.longitude,
+            latitudeDelta: 0.01,
+            longitudeDelta: 0.01 * (width / height),
+        });
+        } catch (err) {
+            console.error("Location error:", err);
+            setRegion({
+                latitude: 23.8103,
+                longitude: 90.4125,
+                latitudeDelta: 0.05,
+                longitudeDelta: 0.05 * (width / height),
+            });
+        } finally {
+            setLoading(false);
+        }
+    };
 
-        fetchLocation();
-    }, []);
+      fetchLocation();
+  }, []);
 
     const handleConfirm = async () => {
         if (!region) {
@@ -108,113 +85,72 @@ export default function AddNewAddress() {
             return;
         }
 
-        try {
-            const [place] = await Location.reverseGeocodeAsync({
+      try {
+          const [place] = await Location.reverseGeocodeAsync({
+              latitude: region.latitude,
+              longitude: region.longitude,
+          });
+
+        const address =
+            [place?.name, place?.street, place?.city, place?.region]
+                .filter(Boolean)
+                .join(", ") ||
+            `${region.latitude.toFixed(6)}, ${region.longitude.toFixed(6)}`;
+
+        setModalVisible(true);
+
+        await AsyncStorage.setItem(
+            "pendingAddress",
+            JSON.stringify({
                 latitude: region.latitude,
                 longitude: region.longitude,
-            });
-
-            const address =
-                [place?.name, place?.street, place?.city, place?.region]
-                    .filter(Boolean)
-                    .join(", ") ||
-                `${region.latitude.toFixed(6)}, ${region.longitude.toFixed(6)}`;
-
-            // instead of redirecting, open modal
-            setModalVisible(true);
-
-            // temporarily store address for saving
-            await AsyncStorage.setItem(
-                "pendingAddress",
-                JSON.stringify({
-                    latitude: region.latitude,
-                    longitude: region.longitude,
-                    currentAddress: address,
-                })
-            );
-        } catch (error) {
-            console.error("Reverse geocode error:", error);
-            Alert.alert("Error", "Unable to retrieve address for this location.");
-        }
-    };
+                currentAddress: address,
+            })
+        );
+      } catch (e) {
+          console.error("Reverse geocode error:", e);
+          Alert.alert("Error", "Unable to retrieve address for this location.");
+      }
+  };
 
     const handleAddAddress = async () => {
         try {
             const pending = await AsyncStorage.getItem("pendingAddress");
             if (!pending) return;
 
-            const addressData = JSON.parse(pending);
-            const label =
-                addressType === "Custom" && customLabel.trim() !== ""
-                    ? customLabel.trim()
-                    : addressType;
+        const addressData = JSON.parse(pending);
+        const label =
+          addressType === "Custom" && customLabel.trim()
+              ? customLabel.trim()
+              : addressType;
 
-            const finalAddress = {
-                ...addressData,
-                label,
-                id: Date.now().toString(), // unique ID for each address
-            };
+        const finalAddress = {
+            ...addressData,
+            label,
+          id: Date.now().toString(),
+      };
 
-            // Fetch existing addresses
-            const existing = await AsyncStorage.getItem("savedAddresses");
-            const addresses = existing ? JSON.parse(existing) : [];
+        const existing = await AsyncStorage.getItem("savedAddresses");
+        const addresses = existing ? JSON.parse(existing) : [];
+        addresses.push(finalAddress);
 
-            // Add new one
-            addresses.push(finalAddress);
+        await AsyncStorage.setItem("savedAddresses", JSON.stringify(addresses));
+        await AsyncStorage.removeItem("pendingAddress");
 
-            // Save updated array
-            await AsyncStorage.setItem("savedAddresses", JSON.stringify(addresses));
+        setModalVisible(false);
 
-            // Clean up
-            await AsyncStorage.removeItem("pendingAddress");
-            setModalVisible(false);
-
-    // Navigate
-            router.push({
-                pathname: "/order/pickupAddress",
-                params: {
-                    latitude: addressData.latitude.toString(),
-                    longitude: addressData.longitude.toString(),
-                    currentAddress: addressData.currentAddress,
-                },
-            });
-        } catch (e) {
-            console.error("Save error:", e);
-        }
-    };
-
-
-    const mapHTML = region
-        ? `
-      <!DOCTYPE html>
-      <html>
-        <head>
-          <meta name="viewport" content="width=device-width, initial-scale=1.0">
-          <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
-          <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-          <style>
-            html, body, #map { height: 100%; margin: 0; padding: 0; }
-            .marker { background: #017FC6; width: 20px; height: 20px; border-radius: 50%; border: 2px solid #fff; }
-          </style>
-        </head>
-        <body>
-          <div id="map"></div>
-          <script>
-            const map = L.map('map').setView([${region.latitude}, ${region.longitude}], 15);
-            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-              maxZoom: 19,
-              crossOrigin: true,
-              detectRetina: true,
-              attribution: '© OpenStreetMap contributors'
-            }).addTo(map);
-            L.marker([${region.latitude}, ${region.longitude}], {
-              icon: L.divIcon({ className: 'marker' })
-            }).addTo(map);
-          </script>
-        </body>
-      </html>
-    `
-        : "";
+        router.push({
+            pathname: "/order/pickupAddress",
+            params: {
+              latitude: String(addressData.latitude),
+              longitude: String(addressData.longitude),
+              currentAddress: addressData.currentAddress,
+          },
+      });
+      } catch (e) {
+          console.error("Save error:", e);
+      }
+  };
 
     if (loading) {
         return (
@@ -241,93 +177,71 @@ export default function AddNewAddress() {
 
     return (
         <View className="flex-1 bg-white">
-            <WebView
-                originWhitelist={["*"]}
-                javaScriptEnabled
-                domStorageEnabled
-                allowFileAccess
-                allowUniversalAccessFromFileURLs
-                source={{ html: mapHTML }}
-                style={{ flex: 1 }}
-            />
+          <MapView
+              style={{ flex: 1 }}
+              provider={Platform.OS === "android" ? PROVIDER_GOOGLE : undefined}
+              region={region}
+              showsUserLocation
+              onRegionChangeComplete={(r) => setRegion(r)}
+          >
+              {/* Optional marker if you want a pin: */}
+              {/* <Marker coordinate={region} title="Your Location" pinColor="#017FC6" /> */}
+          </MapView>
 
-            {/* Bottom Buttons */}
-            <View className="flex-row items-center justify-between px-5 pb-5 bg-white my-10">
-                <TouchableOpacity
-                    onPress={() => router.back()}
-                    className="flex-1 mr-2 bg-gray-100 h-12 rounded-xl items-center justify-center"
-                >
-                    <Text className="text-gray-700 font-semibold text-base">Cancel</Text>
-                </TouchableOpacity>
+          {/* Bottom Buttons */}
+          <View className="flex-row items-center justify-between px-5 pb-5 bg-white my-10">
+              <TouchableOpacity
+                  onPress={() => router.back()}
+                  className="flex-1 mr-2 bg-gray-100 h-12 rounded-xl items-center justify-center"
+              >
+                  <Text className="text-gray-700 font-semibold text-base">Cancel</Text>
+              </TouchableOpacity>
 
-                <TouchableOpacity
-                    onPress={handleConfirm}
-                    className="flex-1 ml-2 bg-[#017FC6] h-12 rounded-xl items-center justify-center"
-                >
-                    <Text className="text-white font-semibold text-base">Confirm</Text>
-                </TouchableOpacity>
-            </View>
+              <TouchableOpacity
+                  onPress={handleConfirm}
+                  className="flex-1 ml-2 bg-[#017FC6] h-12 rounded-xl items-center justify-center"
+              >
+                  <Text className="text-white font-semibold text-base">Confirm</Text>
+              </TouchableOpacity>
+          </View>
 
-            {/* Slide-up Modal */}
-            <Modal
-                visible={modalVisible}
-                animationType="slide"
-                transparent
-                onRequestClose={() => setModalVisible(false)}
-            >
-                <View
-                    style={{
-                        flex: 1,
-                        justifyContent: "flex-end",
-                        backgroundColor: "rgba(0,0,0,0.3)",
-                    }}
+          {/* Slide-up Modal */}
+          <Modal visible={modalVisible} animationType="slide" transparent onRequestClose={() => setModalVisible(false)}>
+              <View style={{ flex: 1, justifyContent: "flex-end", backgroundColor: "rgba(0,0,0,0.3)" }}>
+                  <View style={{ backgroundColor: "#fff", borderTopLeftRadius: 20, borderTopRightRadius: 20, padding: 20 }}>
+                      <Text className="text-xl font-bold mb-4">Set Address Label</Text>
+
+                      {(["Home", "Work", "Custom"] as const).map((item) => (
+                          <TouchableOpacity
+                              key={item}
+                              onPress={() => setAddressType(item)}
+                    className={`p-3 border mb-3 rounded-xl ${addressType === item ? "border-[#017FC6]" : "border-gray-200"
+                        }`}
                 >
-                    <View
-                        style={{
-                            backgroundColor: "#fff",
-                            borderTopLeftRadius: 20,
-                            borderTopRightRadius: 20,
-                            padding: 20,
-                        }}
+                    <Text
+                        className={`text-base ${addressType === item ? "text-[#017FC6] font-semibold" : "text-gray-700"
+                            }`}
                     >
-                        <Text className="text-xl font-bold mb-4">Set Address Label</Text>
+                        {item}
+                    </Text>
+                </TouchableOpacity>
+            ))}
 
-                        {["Home", "Work", "Custom"].map((item) => (
-                            <TouchableOpacity
-                                key={item}
-                                onPress={() => setAddressType(item)}
-                                className={`p-3 border mb-3 rounded-xl ${addressType === item ? "border-[#017FC6]" : "border-gray-200"
-                                    }`}
-                            >
-                                <Text
-                                    className={`text-base ${addressType === item
-                                        ? "text-[#017FC6] font-semibold"
-                                        : "text-gray-700"
-                                        }`}
-                                >
-                                    {item}
-                                </Text>
-                            </TouchableOpacity>
-                        ))}
+                      {addressType === "Custom" && (
+                          <TextInput
+                              placeholder="Enter label (e.g. Parents’ House)"
+                              value={customLabel}
+                              onChangeText={setCustomLabel}
+                              className="border border-gray-300 rounded-lg px-3 py-2 mb-3"
+                          />
+                      )}
 
-                        {addressType === "Custom" && (
-                            <TextInput
-                                placeholder="Enter label (e.g. Parents’ House)"
-                                value={customLabel}
-                                onChangeText={setCustomLabel}
-                                className="border border-gray-300 rounded-lg px-3 py-2 mb-3"
-                            />
-                        )}
-
-                        <TouchableOpacity
-                            onPress={handleAddAddress}
-                            className="bg-[#017FC6] py-3 rounded-xl items-center justify-center"
-                        >
-                            <Text className="text-white font-semibold text-base">Add</Text>
-                        </TouchableOpacity>
-                    </View>
-                </View>
-            </Modal>
-        </View>
-    );
+                      <TouchableOpacity onPress={handleAddAddress} className="bg-[#017FC6] py-3 rounded-xl items-center justify-center">
+                          <Text className="text-white font-semibold text-base">Add</Text>
+                      </TouchableOpacity>
+                  </View>
+              </View>
+          </Modal>
+      </View>
+  );
 }
