@@ -1,5 +1,6 @@
 import { Ionicons } from "@expo/vector-icons";
 import FontAwesome6 from "@expo/vector-icons/FontAwesome6";
+import MaterialCommunityIcons from '@expo/vector-icons/MaterialCommunityIcons';
 import { Tabs } from "expo-router";
 import React from "react";
 import { View } from "react-native";
@@ -44,7 +45,7 @@ export default function TabsLayout() {
           fontWeight: "600",
           marginBottom: 5,
         },
-        tabBarActiveTintColor: "#2563EB",
+        tabBarActiveTintColor: "#017FC6",
         tabBarInactiveTintColor: "#94A3B8",
       }}
     >
@@ -52,12 +53,12 @@ export default function TabsLayout() {
       <Tabs.Screen
         name="index"
         options={{
-          title: "Home",
+          title: "Dashboard",
           tabBarIcon: ({ focused }) =>
             renderIcon(
               focused,
-              <Ionicons
-                name={focused ? "home" : "home-outline"}
+              <MaterialCommunityIcons
+                name={focused ? "view-dashboard-outline" : "view-dashboard-outline"}
                 size={24}
                 color={focused ? "#fff" : "#94A3B8"}
               />
@@ -65,16 +66,16 @@ export default function TabsLayout() {
         }}
       />
 
-      {/* 🚚 Tracking Tab */}
+      {/* 🚚 Orders Tab */}
       <Tabs.Screen
-        name="tracking"
+        name="orders"
         options={{
-          title: "Tracking",
+          title: "Orders",
           tabBarIcon: ({ focused }) =>
             renderIcon(
               focused,
               <FontAwesome6
-                name="map-location-dot"
+                name="box-open"
                 size={22}
                 color={focused ? "#fff" : "#94A3B8"}
               />
@@ -82,6 +83,22 @@ export default function TabsLayout() {
         }}
       />
 
+      {/* ☰ Chat Tab */}
+      <Tabs.Screen
+        name="chat"
+        options={{
+          title: "Chat",
+          tabBarIcon: ({ focused }) =>
+            renderIcon(
+              focused,
+              <Ionicons
+                name={focused ? "chatbubble-ellipses-outline" : "chatbubble-ellipses-outline"}
+                size={26}
+                color={focused ? "#fff" : "#94A3B8"}
+              />
+            ),
+        }}
+      />
       {/* ☰ More Tab */}
       <Tabs.Screen
         name="more"
