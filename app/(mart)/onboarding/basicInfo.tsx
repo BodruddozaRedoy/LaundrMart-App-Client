@@ -6,6 +6,7 @@ import React, { useState } from "react";
 import { Image, ScrollView, Text, TextInput, TouchableOpacity, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import MaterialIcons from '@expo/vector-icons/MaterialIcons';
+import { router } from "expo-router";
 
 export default function BasicInfoScreen() {
     const [image, setImage] = useState<string | null>(null);
@@ -107,7 +108,7 @@ export default function BasicInfoScreen() {
                 </View>
 
                 {/* Continue Button */}
-                <TouchableOpacity className="w-full mb-10">
+                <TouchableOpacity onPress={() => router.push("/(mart)/onboarding/pricingInformation")} className="w-full mb-10">
                     <PrimaryButton text="Continue" />
                 </TouchableOpacity>
             </ScrollView>
