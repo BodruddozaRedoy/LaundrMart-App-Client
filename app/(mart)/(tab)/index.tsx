@@ -2,6 +2,7 @@ import { Ionicons } from "@expo/vector-icons";
 import FontAwesome5 from "@expo/vector-icons/FontAwesome5";
 import FontAwesome6 from "@expo/vector-icons/FontAwesome6";
 import MaterialCommunityIcons from "@expo/vector-icons/MaterialCommunityIcons";
+import { router } from "expo-router";
 import React from "react";
 import { ScrollView, Text, TouchableOpacity, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
@@ -58,7 +59,7 @@ export default function DashboardScreen() {
             </Text>
             <Text className="text-gray-500 text-md">Ready for laundry?</Text>
           </View>
-          <TouchableOpacity>
+          <TouchableOpacity onPress={() => router.push("/(mart)/notification")}>
             <Ionicons name="notifications-outline" size={22} color="#111827" />
           </TouchableOpacity>
         </View>

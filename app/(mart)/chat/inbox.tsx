@@ -12,7 +12,7 @@ import {
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
-const ChatScreen = () => {
+const InboxScreen = () => {
   const [message, setMessage] = useState("");
 
   const messages = [
@@ -136,7 +136,7 @@ const ChatScreen = () => {
     <SafeAreaView className="flex-1 bg-white pt-5">
       {/* Header */}
       <View className="flex-row items-center px-4 py-3 border-b border-gray-100">
-        <TouchableOpacity onPress={() => router.push("/(custormer)/more/supportChat")}>
+        <TouchableOpacity onPress={() => router.push("/(mart)/(tab)/chat")}>
           <Ionicons name="arrow-back" size={24} color="black" />
         </TouchableOpacity>
 
@@ -156,7 +156,7 @@ const ChatScreen = () => {
 
         <View className="flex-row gap-2">
             <TouchableOpacity className="">
-          <Entypo name="phone" size={24} color="black" />
+          <Entypo name="phone" size={24} color="#017FC6" />
         </TouchableOpacity>
         <TouchableOpacity className="ml-2">
           <Ionicons name="ellipsis-vertical" size={20} color="#444" />
@@ -195,4 +195,4 @@ const ChatScreen = () => {
   );
 };
 
-export default ChatScreen;
+export default InboxScreen;

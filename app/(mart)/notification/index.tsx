@@ -58,7 +58,7 @@ export default function NotificationScreen() {
                     <Text className="text-lg font-semibold text-[#1E293B]">
                         Notifications
                     </Text>
-                    <View className="w-5" /> {/* spacer for symmetry */}
+                    <View className="w-5" />
                 </View>
 
                 {/* ✅ Notifications List */}

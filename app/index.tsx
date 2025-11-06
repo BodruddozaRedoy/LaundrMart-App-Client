@@ -9,7 +9,7 @@ export default function Index() {
     }
 
     return role === "mart"
-        ? <Redirect href="/(mart)/onboarding/basicInfo" />
+        ? <Redirect href="/(mart)/(tab)" />
         : <Redirect href="/(customer)/(tab)" />;
 }
 

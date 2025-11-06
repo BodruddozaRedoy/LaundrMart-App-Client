@@ -6,14 +6,13 @@ import { SafeAreaView } from "react-native-safe-area-context";
 
 const MoreScreen = () => {
     const menuItems = [
-        { id: 1, icon: "person-outline", title: "Personal Info", link: "/(mart)/more/profileInfo" },
+        { id: 1, icon: "person-outline", title: "Laundry Info", link: "/(mart)/more/laundryInfo" },
         { id: 2, icon: "settings-outline", title: "Settings", link: "/(mart)/more/settings" },
-        { id: 3, icon: "chatbubble-outline", title: "Support chat", link: "/(mart)/more/supportChat" },
-        { id: 4, icon: "information-circle-outline", title: "Privacy & Policy", link: "/(mart)/more/privacyPolicy" },
-        { id: 5, icon: "information-circle-outline", title: "Terms & Conditions", link: "/(mart)/more/termsConditions" },
-        { id: 6, icon: "information-circle-outline", title: "Laundry Protection", link: "/(mart)/more/laundryProtection" },
-        { id: 7, icon: "help-circle-outline", title: "FAQ", link: "/(mart)/more/faq" },
-        { id: 8, icon: "log-out-outline", title: "Log Out", link: "/(mart)/welcome" },
+        { id: 3, icon: "information-circle-outline", title: "Privacy & Policy", link: "/(mart)/more/privacyPolicy" },
+        { id: 4, icon: "information-circle-outline", title: "Terms & Conditions", link: "/(mart)/more/termsConditions" },
+        { id: 5, icon: "information-circle-outline", title: "Laundry Protection", link: "/(mart)/more/laundryProtection" },
+        { id: 6, icon: "help-circle-outline", title: "FAQ", link: "/(mart)/more/faq" },
+        { id: 7, icon: "log-out-outline", title: "Log Out", link: "/(mart)/welcome" },
     ];
 
     return (
@@ -53,14 +52,6 @@ const MoreScreen = () => {
                     </TouchableOpacity>
                 ))}
             </ScrollView>
-
-            {/* Referral Section */}
-            <TouchableOpacity onPress={() => router.push("/more/inviteFriends")} className="bg-[#EAF6FF] p-4 rounded-xl mx-4 my-4 flex-row items-center justify-center">
-                <Ionicons name="gift-outline" size={20} color="#007AFF" />
-                <Text className="ml-2 text-primary font-medium">
-                    Share LaundrMart: Give $20, Get $20
-                </Text>
-            </TouchableOpacity>
         </SafeAreaView>
     );
 };

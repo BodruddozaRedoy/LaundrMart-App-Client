@@ -26,7 +26,7 @@ const FAQScreen = () => {
   return (
     <SafeAreaView className="flex-1 bg-white pt-5">
       <View className="flex-row items-center px-5 mb-4">
-        <TouchableOpacity onPress={() => router.push("/more")}>
+        <TouchableOpacity onPress={() => router.push("/(mart)/(tab)/more")}>
           <Ionicons name="arrow-back" size={24} color="black" />
         </TouchableOpacity>
         <Text className="flex-1 text-center text-lg font-semibold text-gray-800">

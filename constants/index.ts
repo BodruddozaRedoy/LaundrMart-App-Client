@@ -193,7 +193,7 @@ export const orders = [
     pricePerLb: "$1.75",
     serviceFee: "$3.50",
     notes: "Please separate delicates. Cold wash preferred.",
-    status: "Pending",
+    status: "Request",
     report: {
       title: "Report Details",
       description:

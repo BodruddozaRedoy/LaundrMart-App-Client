@@ -11,7 +11,7 @@ const SettingsScreen = () => {
     <SafeAreaView className="flex-1 bg-white px-5">
       {/* Header */}
       <View className="flex-row items-center mb-5 mt-2">
-        <TouchableOpacity onPress={() => router.push("/more")}>
+        <TouchableOpacity onPress={() => router.push("/(mart)/(tab)/more")}>
           <Ionicons name="arrow-back" size={24} color="black" />
         </TouchableOpacity>
         <Text className="flex-1 text-center text-lg font-semibold text-gray-800">
