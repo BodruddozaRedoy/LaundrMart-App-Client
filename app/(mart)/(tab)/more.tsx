@@ -1,18 +1,26 @@
 import { Ionicons } from "@expo/vector-icons";
-import { router } from "expo-router";
+import { router, type Href } from "expo-router";
 import React from "react";
+import type { ComponentProps } from "react";
 import { Image, ScrollView, StatusBar, Text, TouchableOpacity, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
+type MenuItem = {
+    id: number;
+    icon: ComponentProps<typeof Ionicons>["name"];
+    title: string;
+    link: Href;
+};
+
 const MoreScreen = () => {
-    const menuItems = [
+    const menuItems: MenuItem[] = [
         { id: 1, icon: "person-outline", title: "Laundry Info", link: "/(mart)/more/laundryInfo" },
         { id: 2, icon: "settings-outline", title: "Settings", link: "/(mart)/more/settings" },
         { id: 3, icon: "information-circle-outline", title: "Privacy & Policy", link: "/(mart)/more/privacyPolicy" },
         { id: 4, icon: "information-circle-outline", title: "Terms & Conditions", link: "/(mart)/more/termsConditions" },
         { id: 5, icon: "information-circle-outline", title: "Laundry Protection", link: "/(mart)/more/laundryProtection" },
         { id: 6, icon: "help-circle-outline", title: "FAQ", link: "/(mart)/more/faq" },
-        { id: 7, icon: "log-out-outline", title: "Log Out", link: "/(mart)/welcome" },
+        { id: 7, icon: "log-out-outline", title: "Log Out", link: "/(auth)/welcome" },
     ];
 
     return (
