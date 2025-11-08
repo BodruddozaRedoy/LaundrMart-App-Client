@@ -1,3 +1,4 @@
+import HeaderBackButton from "@/components/common/HeaderBackButton";
 import PrimaryButton from "@/components/shared/PrimaryButton";
 import { Ionicons } from "@expo/vector-icons";
 import * as ImagePicker from "expo-image-picker";
@@ -76,9 +77,7 @@ export default function ReportDamageScreen() {
             >
                 {/* Header */}
                 <View className="flex-row items-center mb-4 justify-between">
-                    <TouchableOpacity onPress={() => router.back()}>
-                        <Ionicons name="chevron-back" size={22} color="#111827" />
-                    </TouchableOpacity>
+                    <HeaderBackButton onPress={() => router.back()} />
                     <Text className="ml-2 text-lg font-semibold text-center text-gray-900">
                         Report Damage / Stain
                     </Text>
