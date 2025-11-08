@@ -1,5 +1,6 @@
 import { images } from "@/constants";
-import React from "react";
+import { useFocusEffect } from "expo-router";
+import React, { useCallback } from "react";
 import { Dimensions, Image, StyleSheet, Text, View } from "react-native";
 import { Gesture, GestureDetector } from "react-native-gesture-handler";
 import Animated, {
@@ -41,28 +42,34 @@ const SlideToOrder: React.FC<SlideToOrderProps> = ({ onSlideComplete }) => {
         transform: [{ translateX: translateX.value }],
     }));
 
+    useFocusEffect(
+        useCallback(() => {
+            // Reset slider position when returning to this screen
+            translateX.value = withSpring(0);
+        }, [])
+    );
+
+
     return (
         <View style={styles.container}>
             <View style={styles.slider}>
+                {/* Text */}
+                <Text style={styles.text} className="ml-56">
+                    Slide to place order
+                </Text>
                 <GestureDetector gesture={pan}>
                     <Animated.View style={[StyleSheet.absoluteFill, animatedContentStyle]}>
-                        <View className="flex items-center justify-center mt-8">
-                            {/* Text */}
-                            <Text style={styles.text} className="ml-56">
-                                Slide to place order
-                            </Text>
-
+                        <View className="flex items-center justify-center mt-11">
                             {/* Arrow */}
                             <Image
                                 source={images.SliderArrow}
                                 style={styles.logo}
                                 resizeMode="contain"
                             />
-
                             {/* Logo (was knob before) */}
                             <View style={styles.knob}>
                                 <Image
-                                    source={images.Logo}
+                                    source={images.SliderLogo}
                                     style={styles.knobLogo}
                                     resizeMode="contain"
                                 />

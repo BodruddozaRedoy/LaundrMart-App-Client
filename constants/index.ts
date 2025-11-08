@@ -10,6 +10,7 @@ import ForgetPassIllustration from "../assets/images/forget-password-illustratio
 import FullService from "../assets/images/full-service.png";
 import ReceiveParcel from "../assets/images/receive-parcel.png";
 import Logo from "../assets/images/splash-icon.png";
+import SliderLogo from "../assets/images/slider-logo.png";
 
 export const images = {
   AuthWelcome,
@@ -23,6 +24,7 @@ export const images = {
   CarBannerOne,
   SliderArrow,
   BotoshLaundry,
+  SliderLogo,
 };
 
 export const laundries: Laundry[] = [
