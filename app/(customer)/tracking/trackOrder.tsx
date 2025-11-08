@@ -1,3 +1,4 @@
+import HeaderBackButton from "@/components/common/HeaderBackButton";
 import { orders } from "@/constants";
 import { Ionicons } from "@expo/vector-icons";
 import { useLocalSearchParams, useRouter } from "expo-router";
@@ -26,9 +27,7 @@ export default function TrackOrderScreen() {
       <StatusBar barStyle={"dark-content"} />
       {/* Header */}
       <View className="flex-row items-center justify-between px-5 py-3 border-b border-[#E2E8F0]">
-        <TouchableOpacity onPress={() => router.push("/(tab)/tracking")}>
-          <Ionicons name="arrow-back-outline" size={22} color="#1E293B" />
-        </TouchableOpacity>
+        <HeaderBackButton onPress={() => router.back()} />
         <Text className="text-lg font-semibold text-[#1E293B]">Track Order</Text>
         <View className="w-5" />
       </View>

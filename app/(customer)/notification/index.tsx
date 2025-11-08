@@ -1,3 +1,4 @@
+import HeaderBackButton from "@/components/common/HeaderBackButton";
 import { Ionicons } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
 import React from "react";
@@ -52,9 +53,7 @@ export default function NotificationScreen() {
             <View className="flex-1 bg-white">
                 {/* ✅ Header */}
                 <View className="flex-row items-center justify-between px-5 pt-5 pb-3 border-b border-[#E2E8F0]">
-                    <TouchableOpacity onPress={() => router.back()}>
-                        <Ionicons name="arrow-back-outline" size={22} color="#1E293B" />
-                    </TouchableOpacity>
+                    <HeaderBackButton onPress={() => router.back()} />
                     <Text className="text-lg font-semibold text-[#1E293B]">
                         Notifications
                     </Text>

@@ -1,3 +1,4 @@
+import HeaderBackButton from "@/components/common/HeaderBackButton";
 import { Ionicons } from "@expo/vector-icons";
 import { Stack, useRouter, useSegments } from "expo-router";
 import React from "react";
@@ -41,25 +42,10 @@ export default function OrderLayout() {
                     color: "#1E293B",
                 },
                 headerLeft: () => (
-                    <TouchableOpacity
-                        onPress={() => router.back()}
-                        style={{ paddingHorizontal: 15 }}
-                    >
-                        <Ionicons name="arrow-back-outline" size={22} color="#1E293B" />
-                    </TouchableOpacity>
+                    <HeaderBackButton onPress={() => router.back()} />
                 ),
             }}
         >
-            {/* <Stack.Screen name="index" options={{ headerShown: false }} /> */}
-            {/* <Stack.Screen name="placeOrder" /> */}
-            {/* <Stack.Screen name="pickupAddress" /> */}
-            {/* <Stack.Screen name="addNewAddress" /> */}
-            {/* <Stack.Screen name="chooseLaundryMart" /> */}
-            {/* <Stack.Screen name="laundryDetails" /> */}
-            {/* <Stack.Screen name="bookNow" /> */}
-            {/* <Stack.Screen name="reviewOrder" /> */}
-            {/* <Stack.Screen name="orderConfirm" /> */}
-            {/* <Stack.Screen name="notifications" /> */}
         </Stack>
     );
 }
