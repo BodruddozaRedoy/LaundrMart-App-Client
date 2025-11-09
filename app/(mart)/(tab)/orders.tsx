@@ -4,7 +4,6 @@ import { router } from "expo-router";
 import React, { useState } from "react";
 import {
     FlatList,
-    Modal,
     StatusBar,
     Text,
     TouchableOpacity,
@@ -159,7 +158,7 @@ export default function OrderScreen() {
                                         </Text>
                                     </TouchableOpacity>
 
-                                    <TouchableOpacity onPress={() => router.push({ pathname: "/tracking/trackOrder", params: { id: item.id } })} className="flex-1 bg-[#017FC6] rounded-lg py-2 items-center">
+                                    <TouchableOpacity className="flex-1 bg-[#017FC6] rounded-lg py-2 items-center">
                                         <Text className="text-sm font-medium text-white">
                                             Accept
                                         </Text>
