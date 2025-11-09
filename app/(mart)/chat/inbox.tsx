@@ -162,6 +162,10 @@ const InboxScreen = () => {
         </TouchableOpacity>
         </View>
       </View>
+      <View className="fixed top-3 z-10 rounded-lg flex-row justify-center items-center gap-2 py-3 bg-primary/10 mx-3">
+        <Text className="text-black/50">View customer order details?</Text>
+        <TouchableOpacity><Text className="text-primary font-bold">Click here.</Text></TouchableOpacity>
+      </View>
 
       {/* Messages */}
       <FlatList
