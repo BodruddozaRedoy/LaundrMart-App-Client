@@ -4,6 +4,7 @@ import { router } from "expo-router";
 import React, { useState } from "react";
 import {
     FlatList,
+    Modal,
     StatusBar,
     Text,
     TouchableOpacity,
@@ -17,6 +18,7 @@ export default function OrderScreen() {
     const [selectedTab, setSelectedTab] = useState<"Request" | "Active" | "Completed">(
         "Request"
     );
+
 
     const filteredOrders = orders.filter((order) => {
         if (selectedTab === "Request") return order.status === "Request";
@@ -191,6 +193,8 @@ export default function OrderScreen() {
                     </View>
                 )}
             />
+
+
         </SafeAreaView>
     );
 }
