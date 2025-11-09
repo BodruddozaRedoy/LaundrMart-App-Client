@@ -148,7 +148,7 @@ export default function HomeScreen() {
         </TouchableOpacity>
       </View>
       </ScrollView>
-      <SlideToOrder onSlideComplete={() => router.push("/order/placeOrder")} />
+      <SlideToOrder />
     </View>
   );
 }
