@@ -19,31 +19,32 @@ const KNOB_SIZE = 60;
 
 export default function SlideToOrder() {
     const translateX = useSharedValue(0);
-    const frontOpacity = useSharedValue(1); // 🔹 to fade out the slider visuals
+    const frontOpacity = useSharedValue(1);
+    const letsGoOpacity = useSharedValue(0);
+    const letsGoY = useSharedValue(20); // start slightly below
     const maxSlide = SLIDE_WIDTH - KNOB_SIZE - 10;
 
     const [statusText, setStatusText] = useState("Slide to place order");
     const isMounted = useRef(true);
-    const confirming = useRef(false); // prevent retriggers
+    const confirming = useRef(false);
 
     /** ---- handle final confirmation ---- */
     const handleConfirm = useCallback(() => {
         if (!isMounted.current || confirming.current) return;
         confirming.current = true;
-        setStatusText("Lets Go!");
+        setStatusText("");
 
-        // 🔹 Fade out the blue front part
+        // 🟢 Animate "Let's Go!" text (fade + rise)
+        letsGoOpacity.value = withTiming(1, { duration: 600 });
+        letsGoY.value = withTiming(0, { duration: 600 });
+
+        // 🔹 Fade out slider visuals
         frontOpacity.value = withTiming(0, { duration: 400 });
 
-        // Wait before navigating
+        // Navigate right away
         setTimeout(() => {
             if (!isMounted.current) return;
-
-            router.push("/(customer)/order/placeOrder"); // change as needed
-            confirming.current = false;
-            setStatusText("Slide to place order");
-            translateX.value = 0;
-            frontOpacity.value = withTiming(1, { duration: 0 }); // reset instantly
+            router.push("/(customer)/order/placeOrder");
         }, 1000);
     }, []);
 
@@ -70,16 +71,24 @@ export default function SlideToOrder() {
             }
         });
 
-    /** ---- reset when returning ---- */
+    /** ---- reset only when returning ---- */
     useFocusEffect(
         useCallback(() => {
             isMounted.current = true;
             confirming.current = false;
+
+            // delay reset slightly for smoother re-entry
+            const timer = setTimeout(() => {
             translateX.value = withSpring(0);
-            frontOpacity.value = withTiming(1, { duration: 0 });
+                frontOpacity.value = withTiming(1, { duration: 300 });
+                letsGoOpacity.value = 0;
+                letsGoY.value = 20;
             setStatusText("Slide to place order");
+            }, 200);
+
             return () => {
                 isMounted.current = false;
+                clearTimeout(timer);
             };
         }, [])
     );
@@ -97,7 +106,7 @@ export default function SlideToOrder() {
 
     const frontStyle = useAnimatedStyle(() => ({
         transform: [{ translateX: translateX.value }],
-        opacity: frontOpacity.value, // fade front visuals
+        opacity: frontOpacity.value,
     }));
 
     const textStyle = useAnimatedStyle(() => {
@@ -116,18 +125,33 @@ export default function SlideToOrder() {
         return { opacity, transform: [{ translateX: tx }] };
     });
 
+    /** ✨ "Let's Go!" animation style */
+    const letsGoStyle = useAnimatedStyle(() => ({
+        opacity: letsGoOpacity.value,
+        transform: [{ translateY: letsGoY.value }],
+    }));
+
     return (
         <View style={styles.container}>
             <View style={styles.slider}>
-                {/* 🟩 Background expanding */}
+                {/* 🟩 expanding background */}
                 <Animated.View style={[styles.behindSlide, bgStyle]} />
 
-                {/* 🟢 Text layer */}
+                {/* 🟢 center text */}
                 <Animated.View style={[styles.textLayer, textStyle]}>
-                    <Text style={styles.behindText}>{statusText}</Text>
+                    {!confirming.current && (
+                        <Text style={styles.behindText}>{statusText}</Text>
+                    )}
                 </Animated.View>
 
-                {/* 🟦 Foreground visuals */}
+                {/* ✨ Let's Go! text (animated from bottom to top) */}
+                <Animated.View style={[styles.textLayer, letsGoStyle]}>
+                    <Text style={[styles.behindText, { fontSize: 18, fontWeight: "700" }]}>
+                        Let's Go!
+                    </Text>
+                </Animated.View>
+
+                {/* 🟦 draggable front visuals */}
                 <GestureDetector gesture={pan}>
                     <Animated.View style={[StyleSheet.absoluteFill, frontStyle]}>
                         <View className="flex items-center justify-center mt-8">
