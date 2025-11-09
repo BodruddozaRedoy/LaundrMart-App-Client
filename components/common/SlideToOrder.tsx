@@ -53,13 +53,9 @@ const SlideToOrder: React.FC<SlideToOrderProps> = ({ onSlideComplete }) => {
     return (
         <View style={styles.container}>
             <View style={styles.slider}>
-                {/* Text */}
-                <Text style={styles.text} className="ml-56">
-                    Slide to place order
-                </Text>
                 <GestureDetector gesture={pan}>
                     <Animated.View style={[StyleSheet.absoluteFill, animatedContentStyle]}>
-                        <View className="flex items-center justify-center mt-11">
+                        <View className="flex items-center justify-center mt-8">
                             {/* Arrow */}
                             <Image
                                 source={images.SliderArrow}
@@ -74,6 +70,10 @@ const SlideToOrder: React.FC<SlideToOrderProps> = ({ onSlideComplete }) => {
                                     resizeMode="contain"
                                 />
                             </View>
+                            {/* Text */}
+                            <Text style={styles.text} className="ml-56">
+                                Slide to place order
+                            </Text>
                         </View>
                     </Animated.View>
                 </GestureDetector>
