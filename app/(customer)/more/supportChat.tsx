@@ -1,15 +1,15 @@
-import React, { useState } from "react";
-import {
-  View,
-  Text,
-  TextInput,
-  FlatList,
-  Image,
-  TouchableOpacity,
-} from "react-native";
-import { SafeAreaView } from "react-native-safe-area-context";
 import { Ionicons } from "@expo/vector-icons";
 import { router } from "expo-router";
+import React, { useState } from "react";
+import {
+  FlatList,
+  Image,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  View,
+} from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
 
 const SupportChatScreen = () => {
   const [search, setSearch] = useState("");
@@ -70,7 +70,7 @@ const SupportChatScreen = () => {
   );
 
   const renderItem = ({ item }: any) => (
-    <TouchableOpacity onPress={() => router.push("/more/chat")} className="flex-row items-center justify-between py-3 border-b border-gray-100">
+    <TouchableOpacity onPress={() => router.push("/(customer)/more/chat")} className="flex-row items-center justify-between py-3 border-b border-gray-100">
       {/* Left Section */}
       <View className="flex-row items-center">
         <Image source={{ uri: item.avatar }} className="w-12 h-12 rounded-full" />
