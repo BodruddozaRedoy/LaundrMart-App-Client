@@ -1,16 +1,17 @@
+import { logoBase64 } from "@/assets/logo";
 import { orders } from "@/constants";
 import { Ionicons } from "@expo/vector-icons";
 import * as Print from "expo-print";
 import { router } from "expo-router";
 import React, { useState } from "react";
 import {
+    Dimensions,
     FlatList,
     Modal,
     StatusBar,
     Text,
     TouchableOpacity,
     View,
-    Dimensions,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
@@ -23,7 +24,7 @@ const isLg = width >= 1024;
 const iconSize = isLg ? 34 : isMd ? 26 : 16;
 
 // 📌 Your full Base64 logo
-const LOGO_BASE64 = `data:image/png;base64,a6xRgAN8WpV/3SRxaePxJMC+0Ko08oIQNp/VLVXxof4pNKKbGtOK8V/6sYT9w2ND... (TRUNCATED FOR DISPLAY) ...Upz71qU+/TfT/A6W0h7Ho4eihAAAAAElFTkSuQmCC`;
+// const LOGO_BASE64 = `data:image/png;base64,a6xRgAN8WpV/3SRxaePxJMC+0Ko08oIQNp/VLVXxof4pNKKbGtOK8V/6sYT9w2ND... (TRUNCATED FOR DISPLAY) ...Upz71qU+/TfT/A6W0h7Ho4eihAAAAAElFTkSuQmCC`;
 
 export default function OrderScreen() {
     const [selectedTab, setSelectedTab] = useState<
@@ -42,9 +43,9 @@ export default function OrderScreen() {
                 <body style="font-family: monospace; width: 260px; margin: 0 auto;">
 
                     <!-- LOGO at Top (Option A) -->
-                    <div style="text-align: center; margin-bottom: 10px;">
+                    <div style="text-align: center; margin-bottom: 10px; margin-top: 10px;">
                         <img 
-                            src="${LOGO_BASE64}"
+                            src="${logoBase64}"
                             style="width:160px; display:block; margin:0 auto;"
                         />
                         <h2 style="margin: 4px 0 0 0;">LaundrMart</h2>
@@ -57,7 +58,7 @@ export default function OrderScreen() {
                         *************************************
                     </p>
 
-                    <h3 style="text-align:center; margin: 0;">CASH RECEIPT</h3>
+                    <h3 style="text-align:center; margin: 0;">INVOICE</h3>
 
                     <p style="text-align:center; margin: 12px 0;">
                         *************************************
