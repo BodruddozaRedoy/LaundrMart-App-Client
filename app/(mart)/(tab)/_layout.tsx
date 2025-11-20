@@ -62,7 +62,7 @@ export default function TabsLayout() {
         tabBarShowLabel: false,
         tabBarStyle: {
           height: TAB_HEIGHT + insets.bottom,
-          paddingBottom: insets.bottom + (isTablet ? 10 : 5),
+          paddingBottom: insets.bottom + (isTablet ? 40 : 5),
           borderTopWidth: 0,
           backgroundColor: "#fff",
           elevation: 10,
@@ -70,7 +70,7 @@ export default function TabsLayout() {
           shadowOpacity: 0.15,
           shadowOffset: { width: 0, height: -3 },
           shadowRadius: 8,
-          paddingTop: isTablet ? 25 : 15,
+          paddingTop: isTablet ? 35 : 15,
         },
       }}
     >
