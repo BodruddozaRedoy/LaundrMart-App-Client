@@ -3,11 +3,11 @@ import { Ionicons } from "@expo/vector-icons";
 import { router } from "expo-router";
 import React, { useState } from "react";
 import {
+  Dimensions,
   Switch,
   Text,
   TouchableOpacity,
   View,
-  Dimensions,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
@@ -45,6 +45,14 @@ const SettingsScreen = () => {
       <TouchableOpacity className="py-3 md:py-5 lg:py-6 flex-row items-center justify-between border-b border-gray-100">
         <Text className="text-gray-800 text-base md:text-2xl lg:text-3xl font-bold">
           Preferences
+        </Text>
+        <Ionicons name="chevron-forward-outline" size={iconSize} color="#888" />
+      </TouchableOpacity>
+
+      {/* Printer manage */}
+      <TouchableOpacity onPress={() => router.push("/(mart)/more/printer-manage")} className="py-3 md:py-5 lg:py-6 flex-row items-center justify-between border-b border-gray-100">
+        <Text className="text-gray-800 text-base md:text-2xl lg:text-3xl font-bold">
+          Printer Manage
         </Text>
         <Ionicons name="chevron-forward-outline" size={iconSize} color="#888" />
       </TouchableOpacity>
