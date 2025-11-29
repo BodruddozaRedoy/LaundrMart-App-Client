@@ -1,3 +1,4 @@
+import HeaderBackButton from '@/components/common/HeaderBackButton';
 import { images } from '@/constants';
 import { Ionicons } from '@expo/vector-icons';
 import { router } from 'expo-router';
@@ -5,11 +6,10 @@ import React, { useState } from 'react';
 import {
     Image,
     ScrollView,
-    StatusBar,
     Text,
     TextInput,
     TouchableOpacity,
-    View,
+    View
 } from 'react-native';
 
 const SignUpScreen = () => {
@@ -25,7 +25,11 @@ const SignUpScreen = () => {
             contentContainerStyle={{ alignItems: 'center', padding: 20 }}
             className="bg-white flex-grow"
         >
-            <StatusBar className="#fff" barStyle={"dark-content"} />
+            {/* <StatusBar className="#fff" barStyle={"dark-content"} /> */}
+            <View className='flex-row justify-between items-center w-full'>
+                <HeaderBackButton onPress={() => router.back()} />
+                <View />
+            </View>
             {/* Logo */}
             <View className="mt-16 w-60 h-20">
                 <Image
@@ -149,6 +153,7 @@ const SignUpScreen = () => {
                     Sign Up
                 </Text>
             </TouchableOpacity>
+            <Text className='text-sm text-gray-400 text-center my-3'>By creating an account, you agree to our terms & condition and privacy policy</Text>
 
             {/* Already have account */}
             <View className="flex-row mt-4">
