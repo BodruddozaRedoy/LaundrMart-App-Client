@@ -25,7 +25,7 @@ const isLg = width >= 1024;
 // 📌 Dynamic scaling
 const avatarSize = isLg ? 70 : isMd ? 55 : 36;
 const headerAvatarSize = isLg ? 80 : isMd ? 60 : 36;
-const iconSize = isLg ? 36 : isMd ? 28 : 20;
+const iconSize = isLg ? 36 : isMd ? 28 : 25;
 const textMd = isLg ? "text-3xl" : isMd ? "text-2xl" : "text-base";
 const textSm = isLg ? "text-2xl" : isMd ? "text-xl" : "text-sm";
 
@@ -420,7 +420,7 @@ const InboxScreen = () => {
           />
 
           <TouchableOpacity className="ml-2">
-            <Ionicons name="image-outline" size={iconSize - 4} color="#007AFF" />
+            <Ionicons name="image-outline" size={iconSize - 4} color="#017FC6" />
           </TouchableOpacity>
 
           <TouchableOpacity

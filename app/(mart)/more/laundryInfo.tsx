@@ -6,6 +6,7 @@ import Octicons from "@expo/vector-icons/Octicons";
 import { router } from "expo-router";
 import React, { useState } from "react";
 import {
+    Dimensions,
     Image,
     KeyboardAvoidingView,
     Text,
@@ -13,7 +14,6 @@ import {
     TouchableOpacity,
     TouchableWithoutFeedback,
     View,
-    Dimensions,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
@@ -75,7 +75,7 @@ const LaundryInfoScreen = () => {
                     {/* Name */}
                     <View className="mb-7 md:mb-10 lg:mb-12">
                         <Text className="text-sm md:text-xl lg:text-2xl text-gray-700 mb-1 md:mb-2">
-                            Name
+                            Laundry Mart Name
                         </Text>
                         <TextInput
                             placeholder="Type here..."
@@ -160,6 +160,23 @@ const LaundryInfoScreen = () => {
                                 color="#007AFF"
                             />
                         </View>
+                    </View>
+
+                    {/* Pricing information */}
+                    <Text className="text-xl font-semibold text-primary mb-3">Pricing Information</Text>
+                    <View className="mb-7 md:mb-10 lg:mb-12">
+                        <Text className="text-sm md:text-xl lg:text-2xl text-gray-700 mb-1 md:mb-2">
+                            Price per pound
+                        </Text>
+                        <TextInput
+                            placeholder="Type here..."
+                            className="
+                                border border-gray-200 rounded-xl px-4 py-3 
+                                text-base md:text-2xl lg:text-3xl
+                                md:py-5 lg:py-6
+                            "
+                            onFocus={() => setShowTooltip(false)}
+                        />
                     </View>
 
                     {/* Update Button */}
