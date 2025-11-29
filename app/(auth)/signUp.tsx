@@ -136,8 +136,8 @@ const SignUpScreen = () => {
                         style={{ marginTop: 2 }}
                     />
                     <Text className="ml-2 text-[#64748B] flex-shrink">
-                        I agree to the <Text className="text-[#2563EB]">Terms & Conditions</Text> and{' '}
-                        <Text className="text-[#2563EB]">Privacy Policy</Text>.
+                        I agree to the <Text className="text-primary">Terms & Conditions</Text> and{' '}
+                        <Text className="text-primary">Privacy Policy</Text>.
                     </Text>
                 </TouchableOpacity>
             </View>
@@ -146,7 +146,7 @@ const SignUpScreen = () => {
             <TouchableOpacity
                 disabled={!agreeTerms}
                 onPress={() => router.push("/(auth)/verify")}
-                className={`w-full p-4 rounded-lg mt-10 ${agreeTerms ? 'bg-[#2563EB]' : 'bg-[#94A3B8]'
+                className={`w-full p-4 rounded-lg mt-10 ${agreeTerms ? 'bg-primary' : 'bg-[#94A3B8]'
                     }`}
             >
                 <Text className="text-white text-center text-lg font-semibold">
@@ -159,7 +159,7 @@ const SignUpScreen = () => {
             <View className="flex-row mt-4">
                 <Text className="text-[#475569]">Already have an account? </Text>
                 <TouchableOpacity onPress={() => router.push('/(auth)/signIn')}>
-                    <Text className="text-[#2563EB] font-semibold">Sign In</Text>
+                    <Text className="text-primary font-semibold">Sign In</Text>
                 </TouchableOpacity>
             </View>
 
@@ -191,7 +191,7 @@ const SignUpScreen = () => {
 
             {/* Continue as Guest */}
             <TouchableOpacity className="mt-8">
-                <Text className="text-[#2563EB] font-semibold text-lg">
+                <Text className="text-primary font-semibold text-lg">
                     Continue as a guest
                 </Text>
             </TouchableOpacity>
