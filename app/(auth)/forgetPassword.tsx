@@ -73,7 +73,7 @@ const ForgetPasswordScreen: React.FC = () => {
             contentContainerStyle={{
               alignItems: 'center',
               padding: 20,
-              flex: 1,
+              // flex: 1,
               justifyContent: 'center',
             }}
             className="bg-white"
