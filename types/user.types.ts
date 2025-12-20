@@ -19,11 +19,11 @@ export interface RegisterPayload {
 export interface AuthResponse {
   success: boolean;
   message: string;
-  token?: string;
+  tokens?: { access: string; refresh: string };
 }
 
 export interface LoginPayload {
-  email: string;
+  email_or_phone: string;
   password: string;
 }
 

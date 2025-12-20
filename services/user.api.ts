@@ -19,7 +19,7 @@ export const registerUser = async (
 export const loginUser = async (
   payload: LoginPayload
 ): Promise<AuthResponse> => {
-  const { data } = await api.post("/auth/login", payload);
+  const { data } = await api.post("/accounts/api/login", payload);
   return data;
 };
 

@@ -1,23 +1,23 @@
-import { useMutation } from "@tanstack/react-query";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import { useMutation } from "@tanstack/react-query";
 
 import {
-  registerUser,
-  loginUser,
   forgotPassword,
+  loginUser,
+  registerUser,
+  resendOtp,
   resetPassword,
   verifyOtp,
-  resendOtp,
 } from "@/services/user.api";
 
 import {
-  RegisterPayload,
-  LoginPayload,
+  AuthResponse,
   ForgotPasswordPayload,
+  LoginPayload,
+  RegisterPayload,
+  ResendOtpPayload,
   ResetPasswordPayload,
   VerifyOtpPayload,
-  ResendOtpPayload,
-  AuthResponse,
 } from "@/types/user.types";
 
 export const useUser = () => {
@@ -30,8 +30,10 @@ export const useUser = () => {
   const loginMutation = useMutation<AuthResponse, Error, LoginPayload>({
     mutationFn: loginUser,
     onSuccess: async (data) => {
-      if (data?.token) {
-        await AsyncStorage.setItem("accessToken", data.token);
+      console.log(data);
+      if (data?.tokens) {
+        await AsyncStorage.setItem("accessToken", data.tokens.access);
+        console.log("token saved");
       }
     },
   });
@@ -55,25 +57,17 @@ export const useUser = () => {
   });
 
   /* VERIFY OTP */
-  const verifyOtpMutation = useMutation<
-    AuthResponse,
-    Error,
-    VerifyOtpPayload
-  >({
+  const verifyOtpMutation = useMutation<AuthResponse, Error, VerifyOtpPayload>({
     mutationFn: verifyOtp,
     onSuccess: async (data) => {
-      if (data?.token) {
-        await AsyncStorage.setItem("accessToken", data.token);
+      if (data?.tokens) {
+        await AsyncStorage.setItem("accessToken", data.tokens.access);
       }
     },
   });
 
   /* RESEND OTP */
-  const resendOtpMutation = useMutation<
-    AuthResponse,
-    Error,
-    ResendOtpPayload
-  >({
+  const resendOtpMutation = useMutation<AuthResponse, Error, ResendOtpPayload>({
     mutationFn: resendOtp,
   });
 

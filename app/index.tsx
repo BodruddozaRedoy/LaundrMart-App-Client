@@ -1,7 +1,7 @@
 import { Redirect } from "expo-router";
 import { StatusBar, useColorScheme } from "react-native";
 
-const role: "customer" | "mart" | null = "mart";
+const role: "customer" | "mart" | null = "customer";
 
 export default function Index() {
     const theme = useColorScheme();

@@ -1,8 +1,9 @@
 import SlideToOrder from "@/components/common/SlideToOrder";
 import { images } from "@/constants";
 import { Ionicons } from "@expo/vector-icons";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 import { router } from "expo-router";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   Dimensions,
   Image,
@@ -23,6 +24,16 @@ export default function HomeScreen() {
   const banners = [images.CarBannerOne, images.CarBannerOne, images.CarBannerOne]; // add more if available
 
   const [activeIndex, setActiveIndex] = useState(0);
+
+
+  useEffect(() => {
+    const fetch = async () => {
+      const token = await AsyncStorage.getItem("accessToken")
+      console.log(token)
+    }
+    fetch()
+  }, [])
+
 
   return (
     <View className="flex-1 bg-white">
