@@ -64,7 +64,7 @@ export default {
           resizeMode: "contain",
           backgroundColor: "#ffffff",
           dark: {
-            backgroundColor: "#000000",
+            backgroundColor: "#ffffff",
           },
         },
       ],
@@ -73,8 +73,7 @@ export default {
         {
           locationAlwaysAndWhenInUsePermission:
             "Allow LaundrMart to use your location to find nearby laundry services.",
-          locationAlwaysPermission:
-            "Allow LaundrMart to use your location.",
+          locationAlwaysPermission: "Allow LaundrMart to use your location.",
           locationWhenInUsePermission:
             "Allow LaundrMart to use your location to show nearby pickup addresses.",
         },
