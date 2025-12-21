@@ -30,7 +30,7 @@ export default function HomeScreen() {
   useEffect(() => {
     const fetch = async () => {
       const token = await AsyncStorage.getItem("accessToken")
-      console.log(token)
+      // console.log(token)
     }
     fetch()
   }, [])
