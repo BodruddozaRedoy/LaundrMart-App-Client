@@ -1,15 +1,16 @@
+import { useUser } from "@/hooks/useUser";
 import { Ionicons } from "@expo/vector-icons";
 import { router, type Href } from "expo-router";
 import type { ComponentProps } from "react";
 import React, { useState } from "react";
 import {
+    Dimensions,
     Image,
     ScrollView,
     StatusBar,
     Text,
     TouchableOpacity,
     View,
-    Dimensions,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
@@ -30,6 +31,16 @@ type MenuItem = {
 
 const MoreScreen = () => {
     const [showLegal, setShowLegal] = useState(false);
+    const { logout } = useUser()
+
+    const handleLogout = async () => {
+        try {
+            await logout()
+            router.replace("/(auth)/welcome")
+        } catch (err) {
+            console.log(err)
+        }
+    }
 
     const menuItems: MenuItem[] = [
         { id: 1, icon: "person-outline", title: "Laundry Info", link: "/(mart)/more/laundryInfo" },
@@ -152,7 +163,7 @@ const MoreScreen = () => {
 
                 {/* Log Out */}
                 <TouchableOpacity
-                    onPress={() => router.push("/(auth)/welcome")}
+                    onPress={handleLogout}
                     className="flex-row items-center justify-between py-4 md:py-6 lg:py-8 border-b border-gray-100 mt-2"
                 >
                     <View className="flex-row items-center">

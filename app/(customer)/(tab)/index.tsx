@@ -3,7 +3,7 @@ import { images } from "@/constants";
 import { useUser } from "@/hooks/useUser";
 import { Ionicons } from "@expo/vector-icons";
 import { router } from "expo-router";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   Dimensions,
   Image,
@@ -28,7 +28,10 @@ export default function HomeScreen() {
 
 
   const { customerProfile } = useUser()
-  console.log(customerProfile)
+  useEffect(() => {
+    console.log(customerProfile)
+  }, [])
+
 
   return (
     <SafeAreaView className="flex-1 bg-white">
@@ -42,7 +45,7 @@ export default function HomeScreen() {
         <View className="flex-row justify-between items-center mt-7 mb-6">
           <View>
             <Text className="text-2xl font-bold text-[#1E293B]">
-              Hello, {customerProfile?.name || "There"} 👋
+              Hello, {customerProfile?.full_name || "There"} 👋
             </Text>
             <Text className="text-[#64748B] text-md mt-1">
               Ready for laundry?

@@ -53,7 +53,6 @@ export interface SetPasswordPayload {
 
 export interface CustomerProfile {
   id: string;
-  name?: string;
   full_name: string;
   email?: string;
   image: string;

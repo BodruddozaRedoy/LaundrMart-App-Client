@@ -9,7 +9,7 @@ import {
   resendOtp,
   resetPassword,
   setNewPassword,
-  updateCustomerProfile,
+  updateCustomerProfileForm,
   verifyOtp,
 } from "@/services/user.api";
 
@@ -22,7 +22,6 @@ import {
   ResendOtpPayload,
   ResetPasswordPayload,
   SetPasswordPayload,
-  UpdateCustomerProfilePayload,
   VerifyOtpPayload,
 } from "@/types/user.types";
 
@@ -73,17 +72,10 @@ export const useUser = () => {
   });
 
   /* ---------------- UPDATE CUSTOMER PROFILE ---------------- */
-  const updateProfileMutation = useMutation<
-    CustomerProfile,
-    Error,
-    UpdateCustomerProfilePayload
-  >({
-    mutationFn: updateCustomerProfile,
+  const updateProfileMutation = useMutation<CustomerProfile, Error, FormData>({
+    mutationFn: updateCustomerProfileForm,
     onSuccess: async (updatedProfile) => {
-      // 1️⃣ Save to storage
       await storeProfile(updatedProfile);
-
-      // 2️⃣ Update query cache directly
       queryClient.setQueryData(["customer-profile"], updatedProfile);
     },
   });

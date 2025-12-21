@@ -1,3 +1,4 @@
+import { useToast } from "@/components/ui/toast/ToastContext";
 import { useUser } from "@/hooks/useUser";
 import { Ionicons } from "@expo/vector-icons";
 import { Href, router } from "expo-router";
@@ -71,7 +72,19 @@ const legalItems: MenuItem[] = [
 
 const MoreScreen = () => {
     const [showLegal, setShowLegal] = useState(false);
-    const { customerProfile } = useUser()
+    const { customerProfile, logout } = useUser()
+    const { success } = useToast()
+
+
+    const handleLogout = async () => {
+        try {
+            await logout()
+            router.replace("/(auth)/welcome")
+            success("Log out successfully!")
+        } catch (err) {
+            console.log(err)
+        }
+    }
 
 
 
@@ -90,7 +103,7 @@ const MoreScreen = () => {
                     />
                     <View className="flex-1">
                         <Text className="text-xl font-bold text-gray-800">
-                            {customerProfile?.name || "Not set yet"}
+                            {customerProfile?.full_name || "Not set yet"}
                         </Text>
                         <Text className="text-sm text-gray-500">
                             {customerProfile?.email}
@@ -161,7 +174,7 @@ const MoreScreen = () => {
 
                 {/* Log Out at bottom */}
                 <TouchableOpacity
-                    onPress={() => router.push("/(auth)/welcome" as Href)}
+                    onPress={handleLogout}
                     className="flex-row items-center justify-between py-4 border-b border-gray-100 mt-2"
                 >
                     <View className="flex-row items-center">

@@ -8,7 +8,6 @@ import {
   ResendOtpPayload,
   ResetPasswordPayload,
   SetPasswordPayload,
-  UpdateCustomerProfilePayload,
   VerifyOtpPayload,
 } from "@/types/user.types";
 
@@ -60,14 +59,22 @@ export const resendOtp = async (
 export const setNewPassword = async (
   payload: SetPasswordPayload
 ): Promise<AuthResponse> => {
-  const { data } = await api.patch("/accounts/api/change-password", payload);
+  const { data } = await api.patch("/accounts/api/change-password", payload, {
+    headers: {
+      "Content-Type": "multipart/form-data",
+    },
+  });
   //   console.log(data);
   return data;
 };
 
-export const updateCustomerProfile = async (
-  payload: UpdateCustomerProfilePayload
+export const updateCustomerProfileForm = async (
+  payload: FormData
 ): Promise<CustomerProfile> => {
-  const { data } = await api.patch("/accounts/api/customer-profile", payload);
+  const { data } = await api.patch("/accounts/api/customer-profile", payload, {
+    headers: {
+      "Content-Type": "multipart/form-data",
+    },
+  });
   return data;
 };
