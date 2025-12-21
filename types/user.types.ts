@@ -50,3 +50,15 @@ export interface ResendOtpPayload {
 export interface SetPasswordPayload {
   new_password: string;
 }
+
+export interface CustomerProfile {
+  id: string;
+  name?: string;
+  email?: string;
+  image: string;
+  phone_number?: string;
+  role: "Customer";
+  location?: string;
+  lat: string;
+  lng: string;
+}

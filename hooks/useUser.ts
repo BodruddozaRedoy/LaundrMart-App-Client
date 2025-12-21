@@ -1,8 +1,9 @@
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import { useMutation } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 
 import {
   forgotPassword,
+  getCustomerProfile,
   loginUser,
   registerUser,
   resendOtp,
@@ -13,6 +14,7 @@ import {
 
 import {
   AuthResponse,
+  CustomerProfile,
   ForgotPasswordPayload,
   LoginPayload,
   RegisterPayload,
@@ -22,25 +24,53 @@ import {
   VerifyOtpPayload,
 } from "@/types/user.types";
 
+import {
+  clearProfile,
+  getStoredProfile,
+  storeProfile,
+} from "@/lib/profileStorage";
+
 export const useUser = () => {
-  /* REGISTER */
+  const queryClient = useQueryClient();
+
+  /* ---------------- REGISTER ---------------- */
   const registerMutation = useMutation<AuthResponse, Error, RegisterPayload>({
     mutationFn: registerUser,
   });
 
-  /* LOGIN */
+  /* ---------------- LOGIN ---------------- */
   const loginMutation = useMutation<AuthResponse, Error, LoginPayload>({
     mutationFn: loginUser,
     onSuccess: async (data) => {
-      console.log(data);
-      if (data?.tokens) {
+      if (data?.tokens?.access) {
         await AsyncStorage.setItem("accessToken", data.tokens.access);
-        console.log("token saved");
+
+        // fetch & cache profile immediately
+        const profile = await getCustomerProfile();
+        await storeProfile(profile);
+
+        queryClient.setQueryData(["customer-profile"], profile);
       }
     },
   });
 
-  /* FORGOT PASSWORD */
+  /* ---------------- CUSTOMER PROFILE ---------------- */
+  const customerProfileQuery = useQuery<CustomerProfile | null>({
+    queryKey: ["customer-profile"],
+    queryFn: async () => {
+      const cachedProfile = await getStoredProfile();
+      if (cachedProfile) return cachedProfile;
+
+      const profile = await getCustomerProfile();
+      await storeProfile(profile);
+      return profile;
+    },
+    staleTime: Infinity,
+    gcTime: Infinity, // ✅ instead of cacheTime
+    retry: false,
+  });
+
+  /* ---------------- FORGOT PASSWORD ---------------- */
   const forgotPasswordMutation = useMutation<
     AuthResponse,
     Error,
@@ -49,7 +79,7 @@ export const useUser = () => {
     mutationFn: forgotPassword,
   });
 
-  /* RESET PASSWORD */
+  /* ---------------- RESET PASSWORD ---------------- */
   const resetPasswordMutation = useMutation<
     AuthResponse,
     Error,
@@ -58,22 +88,27 @@ export const useUser = () => {
     mutationFn: resetPassword,
   });
 
-  /* VERIFY OTP */
+  /* ---------------- VERIFY OTP ---------------- */
   const verifyOtpMutation = useMutation<AuthResponse, Error, VerifyOtpPayload>({
     mutationFn: verifyOtp,
     onSuccess: async (data) => {
-      if (data?.tokens) {
+      if (data?.tokens?.access) {
         await AsyncStorage.setItem("accessToken", data.tokens.access);
+
+        const profile = await getCustomerProfile();
+        await storeProfile(profile);
+
+        queryClient.setQueryData(["customer-profile"], profile);
       }
     },
   });
 
-  /* RESEND OTP */
+  /* ---------------- RESEND OTP ---------------- */
   const resendOtpMutation = useMutation<AuthResponse, Error, ResendOtpPayload>({
     mutationFn: resendOtp,
   });
 
-  /* -------- SET PASSWORD -------- */
+  /* ---------------- SET PASSWORD ---------------- */
   const setPasswordMutation = useMutation<
     AuthResponse,
     Error,
@@ -82,12 +117,21 @@ export const useUser = () => {
     mutationFn: setNewPassword,
   });
 
-  /* LOGOUT */
+  /* ---------------- LOGOUT ---------------- */
   const logout = async () => {
     await AsyncStorage.removeItem("accessToken");
+    await clearProfile();
+
+    queryClient.removeQueries({
+      queryKey: ["customer-profile"],
+    });
   };
 
   return {
+    /* queries */
+    customerProfile: customerProfileQuery.data,
+    customerProfileState: customerProfileQuery,
+
     /* actions */
     register: registerMutation.mutateAsync,
     login: loginMutation.mutateAsync,

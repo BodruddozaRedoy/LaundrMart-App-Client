@@ -1,9 +1,9 @@
 import SlideToOrder from "@/components/common/SlideToOrder";
 import { images } from "@/constants";
+import { useUser } from "@/hooks/useUser";
 import { Ionicons } from "@expo/vector-icons";
-import AsyncStorage from "@react-native-async-storage/async-storage";
 import { router } from "expo-router";
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import {
   Dimensions,
   Image,
@@ -27,14 +27,8 @@ export default function HomeScreen() {
   const [activeIndex, setActiveIndex] = useState(0);
 
 
-  useEffect(() => {
-    const fetch = async () => {
-      const token = await AsyncStorage.getItem("accessToken")
-      // console.log(token)
-    }
-    fetch()
-  }, [])
-
+  const { customerProfile } = useUser()
+  console.log(customerProfile)
 
   return (
     <SafeAreaView className="flex-1 bg-white">
@@ -48,7 +42,7 @@ export default function HomeScreen() {
         <View className="flex-row justify-between items-center mt-7 mb-6">
           <View>
             <Text className="text-2xl font-bold text-[#1E293B]">
-              Hello, Redoy 👋
+              Hello, {customerProfile?.name || "There"} 👋
             </Text>
             <Text className="text-[#64748B] text-md mt-1">
               Ready for laundry?

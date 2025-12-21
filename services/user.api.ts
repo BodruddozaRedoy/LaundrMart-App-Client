@@ -1,6 +1,7 @@
 import { api } from "@/lib/axios";
 import {
   AuthResponse,
+  CustomerProfile,
   ForgotPasswordPayload,
   LoginPayload,
   RegisterPayload,
@@ -21,6 +22,11 @@ export const loginUser = async (
   payload: LoginPayload
 ): Promise<AuthResponse> => {
   const { data } = await api.post("/accounts/api/login", payload);
+  return data;
+};
+
+export const getCustomerProfile = async (): Promise<CustomerProfile> => {
+  const { data } = await api.get("/accounts/api/customer-profile");
   return data;
 };
 
