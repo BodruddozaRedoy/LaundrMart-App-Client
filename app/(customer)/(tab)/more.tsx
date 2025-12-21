@@ -74,6 +74,8 @@ const MoreScreen = () => {
     const [showLegal, setShowLegal] = useState(false);
     const { customerProfile, logout } = useUser()
     const { success } = useToast()
+    const [showLogoutModal, setShowLogoutModal] = useState(false);
+
 
 
     const handleLogout = async () => {
@@ -174,7 +176,7 @@ const MoreScreen = () => {
 
                 {/* Log Out at bottom */}
                 <TouchableOpacity
-                    onPress={handleLogout}
+                    onPress={() => setShowLogoutModal(true)}
                     className="flex-row items-center justify-between py-4 border-b border-gray-100 mt-2"
                 >
                     <View className="flex-row items-center">
@@ -199,6 +201,47 @@ const MoreScreen = () => {
                     Share LaundrMart: Give $20, Get $20
                 </Text>
             </TouchableOpacity>
+
+            {/* Logout Confirmation Modal */}
+            {showLogoutModal && (
+                <View className="absolute inset-0 bg-black/40 justify-center items-center">
+                    <View className="w-4/5 bg-white rounded-2xl p-5">
+                        <Text className="text-lg font-semibold text-gray-800 text-center mb-2">
+                            Log out
+                        </Text>
+
+                        <Text className="text-sm text-gray-600 text-center mb-6">
+                            Are you sure you want to log out?
+                        </Text>
+
+                        <View className="flex-row justify-between">
+                            {/* Cancel */}
+                            <TouchableOpacity
+                                onPress={() => setShowLogoutModal(false)}
+                                className="flex-1 py-3 mr-2 rounded-xl border border-gray-200"
+                            >
+                                <Text className="text-center text-gray-700 font-medium">
+                                    Cancel
+                                </Text>
+                            </TouchableOpacity>
+
+                            {/* Confirm */}
+                            <TouchableOpacity
+                                onPress={async () => {
+                                    setShowLogoutModal(false);
+                                    await handleLogout();
+                                }}
+                                className="flex-1 py-3 ml-2 rounded-xl bg-red-500"
+                            >
+                                <Text className="text-center text-white font-medium">
+                                    Log Out
+                                </Text>
+                            </TouchableOpacity>
+                        </View>
+                    </View>
+                </View>
+            )}
+
         </SafeAreaView>
     );
 };
