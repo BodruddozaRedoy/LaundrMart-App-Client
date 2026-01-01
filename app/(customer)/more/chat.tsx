@@ -1,8 +1,16 @@
 import HeaderBackButton from "@/components/common/HeaderBackButton";
+import { api } from "@/lib/axios";
+import {
+  connectChatSocket,
+  disconnectChatSocket,
+  sendChatMessage,
+} from "@/lib/chatSocket";
 import { Ionicons } from "@expo/vector-icons";
-import Entypo from "@expo/vector-icons/Entypo";
-import { router } from "expo-router";
-import React, { useState } from "react";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import { useQuery } from "@tanstack/react-query";
+import * as ImagePicker from "expo-image-picker";
+import { router, useLocalSearchParams } from "expo-router";
+import React, { useEffect, useMemo, useState } from "react";
 import {
   FlatList,
   Image,
@@ -14,55 +22,187 @@ import {
   TouchableWithoutFeedback,
   View,
 } from "react-native";
-import { KeyboardAvoidingView } from "react-native-keyboard-controller"; // ✅ New import
+import { KeyboardAvoidingView } from "react-native-keyboard-controller";
 import { SafeAreaView } from "react-native-safe-area-context";
 
+/* =====================
+   TYPES
+===================== */
+interface ChatMessage {
+  id: number;
+  text: string | null;
+  user: string;
+  sender: number;
+  room: number;
+  file: string | null;
+  created_at: string;
+  updated_at: string;
+  seen: boolean;
+}
+
+const MY_USER_ID = 102; // replace with real user id
+
+/* =====================
+   COMPONENT
+===================== */
 const ChatScreen = () => {
+  const { roomId } = useLocalSearchParams<{ roomId: string }>();
+
   const [message, setMessage] = useState("");
+  const [selectedImage, setSelectedImage] = useState<string | null>(null);
+  const [liveMessages, setLiveMessages] = useState<ChatMessage[]>([]);
 
-  const messages = [
-    { id: "1", sender: "other", type: "text", text: "Hi, are you available?", time: "9:41 AM" },
-    { id: "2", sender: "me", type: "text", text: "Yes, I am Available", time: "9:42 AM" },
-    { id: "3", sender: "date", text: "Thursday 24, 2025" },
-    { id: "4", sender: "other", type: "text", text: "Did you hear?", time: "9:44 AM" },
-    { id: "5", sender: "me", type: "audio", time: "9:47 AM" },
-  ];
+  /* =====================
+     RESET ON ROOM CHANGE
+  ===================== */
+  useEffect(() => {
+    setLiveMessages([]);
+  }, [roomId]);
 
-  const renderMessage = ({ item }: any) => {
-    if (item.sender === "date") {
-      return (
-        <View className="items-center my-3">
-          <Text className="text-xs text-gray-400">{item.text}</Text>
-        </View>
-      );
+  /* =====================
+     LOAD HISTORY
+  ===================== */
+  const { data: history = [] } = useQuery<ChatMessage[]>({
+    queryKey: ["chat", roomId],
+    queryFn: async () => {
+      const res = await api.get(`/message/api/message/${roomId}`);
+      return res.data ?? [];
+    },
+  });
+
+  /* =====================
+     WEBSOCKET
+  ===================== */
+  useEffect(() => {
+    let active = true;
+
+    const initSocket = async () => {
+      const token = await AsyncStorage.getItem("accessToken");
+      if (!token) return;
+
+      connectChatSocket(Number(roomId), token, (data) => {
+        if (
+          active &&
+          data?.type === "chat_message" &&
+          data?.message
+        ) {
+          setLiveMessages((prev) => {
+            if (prev.some((m) => m.id === data.message.id)) {
+              return prev;
+            }
+            return [...prev, data.message];
+          });
+        }
+      });
+    };
+
+    initSocket();
+
+    return () => {
+      active = false;
+      disconnectChatSocket();
+    };
+  }, [roomId]);
+
+  /* =====================
+     MERGE + SORT (ONCE)
+  ===================== */
+  const mergedMessages = useMemo(() => {
+    const map = new Map<number, ChatMessage>();
+
+    [...history, ...liveMessages].forEach((msg) => {
+      map.set(msg.id, msg);
+    });
+
+    return Array.from(map.values()).sort(
+      (a, b) =>
+        new Date(a.created_at).getTime() -
+        new Date(b.created_at).getTime()
+    );
+  }, [history, liveMessages]);
+
+  /* =====================
+     PICK IMAGE
+  ===================== */
+  const pickImage = async () => {
+    const perm =
+      await ImagePicker.requestMediaLibraryPermissionsAsync();
+    if (!perm.granted) return alert("Gallery permission required");
+
+    const result = await ImagePicker.launchImageLibraryAsync({
+      mediaTypes: ImagePicker.MediaTypeOptions.Images,
+      quality: 0.8,
+    });
+
+    if (!result.canceled) {
+      setSelectedImage(result.assets[0].uri);
+    }
+  };
+
+  /* =====================
+     SEND MESSAGE
+  ===================== */
+  const handleSendMessage = async () => {
+    if (!message.trim() && !selectedImage) return;
+
+    const text = message;
+    const image = selectedImage;
+
+    setMessage("");
+    setSelectedImage(null);
+    Keyboard.dismiss();
+
+    if (text.trim()) {
+      sendChatMessage({
+        type: "chat_message",
+        message: text,
+      });
     }
 
-    const isMe = item.sender === "me";
+    if (image) {
+      const formData = new FormData();
+      formData.append("file", {
+        uri:
+          Platform.OS === "android"
+            ? image
+            : image.replace("file://", ""),
+        name: "chat.jpg",
+        type: "image/jpeg",
+      } as any);
+
+      await api.post(`/message/api/message/${roomId}`, formData);
+    }
+  };
+
+  /* =====================
+     RENDER MESSAGE
+  ===================== */
+  const renderMessage = ({ item }: { item: ChatMessage }) => {
+    const isMe = item.sender === MY_USER_ID;
 
     return (
-      <View className={`flex-row ${isMe ? "justify-end" : "justify-start"} mb-3 px-2`}>
-        {!isMe && (
-          <Image
-            source={{
-              uri: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRubA-y1eivjuhQZPJ12kTZ8eKqiu2CXPEWDg&s",
-            }}
-            className="w-8 h-8 rounded-full mr-2 self-end"
-          />
-        )}
-        <View className={`max-w-[75%] p-3 rounded-2xl ${isMe ? "bg-primary" : "bg-gray-100"}`}>
-          {item.type === "text" && (
-            <Text className={`${isMe ? "text-white" : "text-gray-800"} text-sm leading-5`}>
+      <View
+        className={`flex-row ${isMe ? "justify-end" : "justify-start"
+          } mb-3 px-2`}
+      >
+        <View
+          className={`max-w-[75%] p-3 rounded-2xl ${isMe ? "bg-primary" : "bg-gray-100"
+            }`}
+        >
+          {item.text && (
+            <Text
+              className={`text-sm ${isMe ? "text-white" : "text-gray-800"
+                }`}
+            >
               {item.text}
             </Text>
           )}
-          {item.type === "audio" && (
-            <View className={`flex-row items-center ${isMe ? "justify-end" : "justify-start"}`}>
-              <Ionicons name="play-circle" size={20} color={isMe ? "white" : "#007AFF"} />
-              <Text className={`mx-2 text-xs ${isMe ? "text-white" : "text-gray-700"}`}>
-                ▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓
-              </Text>
-              <Ionicons name="volume-high-outline" size={16} color={isMe ? "white" : "#007AFF"} />
-            </View>
+
+          {item.file && (
+            <Image
+              source={{ uri: item.file }}
+              className="w-48 h-48 rounded-xl mt-2"
+            />
           )}
         </View>
       </View>
@@ -75,64 +215,59 @@ const ChatScreen = () => {
         <KeyboardAvoidingView
           behavior={Platform.OS === "ios" ? "padding" : "height"}
           style={{ flex: 1 }}
-          keyboardVerticalOffset={Platform.OS === "ios" ? 90 : 0}
+          keyboardVerticalOffset={90}
         >
           {/* Header */}
           <View className="flex-row items-center px-4 py-3 border-b border-gray-100">
-            <HeaderBackButton onPress={() => router.push("/(customer)/more/supportChat")} />
-
-            <View className="flex-row items-center ml-3 flex-1">
-              <Image
-                source={{
-                  uri: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRubA-y1eivjuhQZPJ12kTZ8eKqiu2CXPEWDg&s",
-                }}
-                className="w-9 h-9 rounded-full"
-              />
-              <View className="ml-2">
-                <Text className="text-gray-800 font-semibold">Shirts Laundry</Text>
-                <View className="flex-row items-center">
-                  <View className="w-2 h-2 bg-green-500 rounded-full mr-1" />
-                  <Text className="text-xs text-gray-500">Active Now</Text>
-                </View>
-              </View>
-            </View>
-
-            <View className="flex-row gap-2">
-              <TouchableOpacity>
-                <Entypo name="phone" size={24} color="black" />
-              </TouchableOpacity>
-              <TouchableOpacity className="ml-2">
-                <Ionicons name="ellipsis-vertical" size={20} color="#444" />
-              </TouchableOpacity>
-            </View>
+            <HeaderBackButton
+              onPress={() =>
+                router.push("/(customer)/more/supportChat")
+              }
+            />
+            <Text className="ml-3 font-semibold">Chat</Text>
           </View>
 
           {/* Messages */}
           <FlatList
-            data={messages}
-            keyExtractor={(item) => item.id}
+            data={mergedMessages}
+            // inverted
+            keyExtractor={(item) => String(item.id)}
             renderItem={renderMessage}
-            contentContainerStyle={{ paddingVertical: 10, paddingBottom: 20 }}
-            inverted
-            showsVerticalScrollIndicator={false}
+            contentContainerStyle={{ padding: 10 }}
           />
 
-          {/* Input Field */}
-          <View className="flex-row items-center border-t border-gray-100 px-5 py-4 bg-white">
+          {/* Image Preview */}
+          {selectedImage && (
+            <View className="px-5 pb-2">
+              <Image
+                source={{ uri: selectedImage }}
+                className="w-24 h-24 rounded-xl"
+              />
+            </View>
+          )}
+
+          {/* Input */}
+          <View className="flex-row items-center border-t border-gray-100 px-5 py-4">
             <TextInput
-              placeholder="Send Message"
-              placeholderTextColor="#999"
+              placeholder="Send message"
               value={message}
               onChangeText={setMessage}
-              className="flex-1 bg-gray-100 rounded-full px-4 py-4 text-sm text-gray-700"
+              className="flex-1 bg-gray-100 rounded-full px-4 py-3"
             />
 
-            <TouchableOpacity className="ml-2">
-              <Ionicons name="image-outline" size={22} color="#007AFF" />
+            <TouchableOpacity onPress={pickImage} className="ml-2">
+              <Ionicons
+                name="image-outline"
+                size={22}
+                color="#007AFF"
+              />
             </TouchableOpacity>
 
-            <TouchableOpacity className="ml-3 p-2 rounded-full bg-primary">
-              <Ionicons name="mic-outline" size={22} color="white" />
+            <TouchableOpacity
+              onPress={handleSendMessage}
+              className="ml-2 p-3 rounded-full bg-primary"
+            >
+              <Ionicons name="send" size={16} color="white" />
             </TouchableOpacity>
           </View>
         </KeyboardAvoidingView>

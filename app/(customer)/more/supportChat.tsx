@@ -54,7 +54,7 @@ const SupportChatScreen = () => {
     queryKey: ["supportChat"],
     queryFn: async () => {
       const res = await api.get<ChatRoomResponse>("/message/api/room");
-      return res.data.data;
+      return res.data;
     },
   });
 

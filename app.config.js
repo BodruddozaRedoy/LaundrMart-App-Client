@@ -31,6 +31,7 @@ export default {
 
     android: {
       softwareKeyboardLayoutMode: "resize",
+      usesCleartextTraffic: true,
       adaptiveIcon: {
         backgroundColor: "#ffffff",
         foregroundImage: "./assets/images/app-icon.png",

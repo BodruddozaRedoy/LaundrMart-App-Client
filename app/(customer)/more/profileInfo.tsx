@@ -37,6 +37,8 @@ const PersonalInfoScreen = () => {
         }
     }, [customerProfile]);
 
+    console.log("customerProfile", customerProfile)
+
     // ---------------- IMAGE PICKER ----------------
     const pickImage = async (fromCamera = false) => {
         try {
