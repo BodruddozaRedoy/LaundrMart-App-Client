@@ -47,7 +47,7 @@ api.interceptors.response.use(
       console.log("⬅️ RESPONSE");
       console.log("URL:", response.config.url);
       console.log("STATUS:", response.status);
-      console.log("DATA:", JSON.stringify(response.data, null, 2));
+      // console.log("DATA:", JSON.stringify(response.data, null, 2));
     }
     return response;
   },
