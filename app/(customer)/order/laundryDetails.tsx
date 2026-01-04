@@ -1,8 +1,7 @@
 import PrimaryButton from "@/components/shared/PrimaryButton";
-import { laundries } from "@/constants";
 import { Ionicons } from "@expo/vector-icons";
 import { router, useLocalSearchParams } from "expo-router";
-import React, { useState } from "react";
+import React, { useMemo, useState } from "react";
 import {
     FlatList,
     Image,
@@ -15,199 +14,181 @@ import {
 } from "react-native";
 
 export default function LaundryDetailsScreen() {
-    const { id } = useLocalSearchParams();
-    const laundry = laundries.find((item) => item.id === id) || laundries[0];
+    // 1. Get all data from params
+    const params = useLocalSearchParams();
+
+    // 2. Parse the services array (since it was passed as a string)
+    const services = useMemo(() => {
+        try {
+            return params.vendor_services ? JSON.parse(params.vendor_services as string) : [];
+        } catch (e) {
+            return [];
+        }
+    }, [params.vendor_services]);
+
+    // 3. Format Operating Hours from individual API params
+    const storeHours = useMemo(() => {
+        const days = ["monday", "tuesday", "wednesday", "thursday", "friday", "saturday", "sunday"];
+        return days.map(day => {
+            const isClosed = params[`is_closed_${day}`] === 'true';
+            const start = params[`operating_hours_start_${day}`];
+            const end = params[`operating_hours_end_${day}`];
+
+            return {
+                weekday: day.charAt(0).toUpperCase() + day.slice(1),
+                time: isClosed || !start ? "Closed" : `${String(start).slice(0, 5)} - ${String(end).slice(0, 5)}`
+            };
+        });
+    }, [params]);
 
     const [showHoursModal, setShowHoursModal] = useState(false);
     const [showInfoAlert, setShowInfoAlert] = useState(false);
 
-    const handleCloseInfoAlert = () => setShowInfoAlert(false);
+    return (
+        <View className="flex-1 bg-white">
+            <ScrollView
+                contentContainerStyle={{ paddingBottom: 120 }}
+                showsVerticalScrollIndicator={false}
+                className="px-5 pt-4"
+            >
+                {/* Image */}
+                <Image
+                    source={{ uri: (params.image as string) || 'https://via.placeholder.com/300' }}
+                    className="w-full h-52 rounded-3xl mb-4 bg-gray-100"
+                />
 
-  return (
-      <View className="flex-1 bg-white">
-          <ScrollView
-              contentContainerStyle={{ paddingBottom: 100 }}
-              showsVerticalScrollIndicator={false}
-              className="px-5 pt-4"
-          >
-              {/* Laundry Image */}
-              <Image
-                  source={{ uri: laundry.image }}
-                  className="w-full h-48 rounded-2xl mb-4"
-              />
+                {/* Name & Rating */}
+                <View className="mb-2">
+                    <Text className="text-2xl font-bold text-[#1E293B]">
+                        {params.laundrymart_name || "Laundry Mart"}
+                    </Text>
+                    <View className="flex-row items-center mt-1">
+                        <Text className="text-sm text-[#64748B] mr-2">
+                            {params.location || "Location not provided"}
+                        </Text>
+                        <Ionicons name="star" size={14} color="#FACC15" />
+                        <Text className="text-sm font-bold text-[#1E293B] ml-1">
+                            {params.average_rating || "0.0"}
+                        </Text>
+                    </View>
+                </View>
 
-              {/* Name, Location, Rating */}
-              <View className="mb-2">
-                  <Text className="text-lg font-semibold text-[#1E293B]">
-                      {laundry.name}
-                  </Text>
-                  <View className="flex-row items-center mt-1">
-                      <Text className="text-sm text-[#64748B] mr-2">
-                          {laundry.location || "Cisarua, Bandung"}
-                      </Text>
-                      <Ionicons name="star" size={14} color="#FACC15" />
-                      <Text className="text-sm text-[#64748B] ml-1">
-                          {laundry.rating}
-                      </Text>
-                  </View>
-              </View>
+                {/* Turnaround Time */}
+                <View className="flex-row items-center justify-between mb-4 bg-gray-50 p-4 rounded-2xl">
+                    <View className="flex-row items-center">
+                        <Text className="text-[#64748B] text-sm">Turnaround: </Text>
+                        <Text className="text-[#1E293B] font-bold text-sm">
+                            {params.get_turnaround_time || "Standard"}
+                        </Text>
+                    </View>
+                    <TouchableOpacity onPress={() => setShowInfoAlert(!showInfoAlert)}>
+                        <Ionicons name="information-circle-outline" size={20} color="#2563EB" />
+                    </TouchableOpacity>
+                </View>
 
-              {/* Turnaround Time + Info */}
-              <View className="flex-row items-center justify-between mb-3">
-                  <View className="flex-row">
-                      <Text className="text-[#64748B] text-sm">Turnaround Time: </Text>
-                      <Text className="text-[#1E293B] font-semibold text-sm">
-                          {laundry.turnaround}
-                      </Text>
-                  </View>
+                {/* Description */}
+                <Text className="text-[#475569] text-sm leading-6 mb-5">
+                    {params.vendor_description || "No description provided for this laundry mart."}
+                </Text>
 
-                  {/* Info Icon */}
-                  <TouchableOpacity
-                      className="ml-2 relative"
-                      onPress={() => setShowInfoAlert(!showInfoAlert)}
-                  >
-                      <Ionicons
-                          name="information-circle-outline"
-                          size={18}
-                          color="#2563EB"
-                      />
-                  </TouchableOpacity>
-              </View>
+                {/* Store Hours Toggle */}
+                <TouchableOpacity
+                    className="flex-row items-center justify-between border border-gray-100 p-4 rounded-2xl mb-6"
+                    onPress={() => setShowHoursModal(true)}
+                >
+                    <View className="flex-row items-center">
+                        <Ionicons name="time-outline" size={20} color="#2563EB" />
+                        <Text className="text-[#2563EB] text-sm font-bold ml-2">Check Store Hours</Text>
+                    </View>
+                    <Ionicons name="chevron-forward" size={18} color="#2563EB" />
+                </TouchableOpacity>
 
-              {/* Description */}
-              <Text className="text-[#475569] text-sm leading-5 mb-3">
-                  {laundry.description}
-              </Text>
+                {/* Price */}
+                <View className="mb-8">
+                    <Text className="text-xs text-gray-400 uppercase font-bold tracking-widest mb-1">Starting Price</Text>
+                    <Text className="text-2xl font-black text-[#1E293B]">
+                        ${params.price_per_pound || "0.00"}
+                        <Text className="text-sm font-normal text-[#64748B]"> /lbs</Text>
+                    </Text>
+                </View>
 
-              {/* Store Hours Link */}
-              <TouchableOpacity
-                  className="flex-row items-center mb-5"
-                  onPress={() => setShowHoursModal(true)}
-              >
-                  <Ionicons name="time-outline" size={18} color="#2563EB" />
-                  <Text className="text-[#2563EB] text-sm font-medium ml-1">
-                      See Store Hours
-                  </Text>
-              </TouchableOpacity>
+                {/* Our Services Section */}
+                <Text className="text-lg font-bold text-[#1E293B] mb-4">Our Services</Text>
+                <FlatList
+                    data={services}
+                    horizontal
+                    showsHorizontalScrollIndicator={false}
+                    keyExtractor={(_, index) => index.toString()}
+                    renderItem={({ item }) => (
+                        <View className="mr-4 bg-white border border-gray-100 rounded-3xl p-3 w-40 shadow-sm">
+                            <Image
+                                source={{ uri: item.image || 'https://via.placeholder.com/100' }}
+                                className="w-full h-24 rounded-2xl mb-2 bg-gray-50"
+                            />
+                            <Text className="text-sm font-bold text-[#1E293B]" numberOfLines={1}>
+                                {item.service_name || "Service"}
+                            </Text>
+                            <Text className="text-xs text-blue-600 font-bold mt-1">${item.price_per_pound}</Text>
+                        </View>
+                    )}
+                    ListEmptyComponent={<Text className="text-gray-400 italic">No additional services listed.</Text>}
+                />
+            </ScrollView>
 
-              {/* Price */}
-              <Text className="text-lg font-bold text-[#1E293B] mb-5">
-                  {laundry.price}
-                  <Text className="text-sm font-normal text-[#64748B]"> /lbs</Text>
-              </Text>
+            {/* Sticky Book Now Button */}
+            <View className="absolute bottom-0 left-0 right-0 bg-white p-5 border-t border-gray-100">
+                <TouchableOpacity
+                    onPress={() => router.push({ pathname: "/order/bookNow", params: { id: params.store_id } })}
+                    activeOpacity={0.8}
+                >
+                    <PrimaryButton text="Book Now" />
+                </TouchableOpacity>
+            </View>
 
-              {/* Our Services */}
-              <Text className="text-base font-semibold text-[#1E293B] mb-3">
-                  Our Services
-              </Text>
+            {/* Information Tooltip */}
+            {showInfoAlert && (
+                <Modal visible={showInfoAlert} transparent animationType="fade">
+                    <TouchableWithoutFeedback onPress={() => setShowInfoAlert(false)}>
+                        <View className="flex-1 bg-black/20 justify-center items-center px-10">
+                            <View className="bg-white p-6 rounded-3xl shadow-2xl">
+                                <Text className="text-sm text-[#475569] text-center">
+                                    Estimation based on average loads. Final turnaround depends on the quantity and type of items.
+                                </Text>
+                            </View>
+                        </View>
+                    </TouchableWithoutFeedback>
+                </Modal>
+            )}
 
-              <FlatList
-                  data={laundry.services}
-                  horizontal
-                  showsHorizontalScrollIndicator={false}
-                  keyExtractor={(item) => item.name}
-                  renderItem={({ item }) => (
-                      <View className="mr-4 bg-white border border-gray-200 rounded-xl p-3 w-40">
-                          <Image
-                              source={{ uri: item.image }}
-                              className="w-full h-24 rounded-lg mb-2"
-                          />
-                          <Text className="text-sm font-semibold text-[#1E293B]">
-                              {item.name}
-                          </Text>
-                          <Text className="text-xs text-[#64748B] mt-1">{item.price}</Text>
-                      </View>
-                  )}
-              />
-          </ScrollView>
+            {/* Store Hours Modal (Modern Style) */}
+            <Modal
+                visible={showHoursModal}
+                transparent
+                animationType="slide"
+                onRequestClose={() => setShowHoursModal(false)}
+            >
+                <View className="flex-1 bg-black/50 justify-end">
+                    <View className="bg-white rounded-t-[40px] p-8 h-3/4">
+                        <View className="flex-row items-center justify-between mb-8">
+                            <Text className="text-2xl font-bold text-[#1E293B]">Store Hours</Text>
+                            <TouchableOpacity onPress={() => setShowHoursModal(false)} className="bg-gray-100 p-2 rounded-full">
+                                <Ionicons name="close" size={24} color="#000" />
+                            </TouchableOpacity>
+                        </View>
 
-          {/* Continue Button */}
-          <View className="absolute bottom-10 left-5 right-5">
-              <TouchableOpacity onPress={() => router.push({ pathname: "/order/bookNow", params: { id: laundry?.id } })} className="w-full">
-                  <PrimaryButton text="Book Now" />
-              </TouchableOpacity>
-          </View>
-
-          {/* ✅ Info Alert Overlay */}
-          {showInfoAlert && (
-              <Modal
-                  visible={showInfoAlert}
-                  transparent
-                  animationType="fade"
-                  onRequestClose={handleCloseInfoAlert}
-              >
-                  <TouchableWithoutFeedback onPress={handleCloseInfoAlert}>
-                      <View className="flex-1 bg-black/40 justify-center items-center">
-                          {/* Empty background to catch clicks */}
-                      </View>
-                  </TouchableWithoutFeedback>
-
-                  {/* Tooltip positioned absolutely */}
-                  <View className="absolute top-[330px] right-10 bg-[#F1F5F9] border border-[#CBD5E1] rounded-lg px-4 py-2 w-64 shadow-md z-50">
-                      <View className="flex-row items-start">
-                          <Ionicons
-                              name="information-circle-outline"
-                              size={16}
-                              color="#2563EB"
-                              style={{ marginTop: 2 }}
-                          />
-                          <Text className="text-xs text-[#475569] ml-2">
-                              {laundry.infoAlert}
-                          </Text>
-                      </View>
-                  </View>
-              </Modal>
-          )}
-
-          {/* Store Hours Modal */}
-          <Modal
-              visible={showHoursModal}
-              transparent
-              animationType="fade"
-              onRequestClose={() => setShowHoursModal(false)}
-          >
-              <View className="flex-1 bg-black/40 justify-center items-center">
-                  <View className="bg-white rounded-2xl w-80 p-5 shadow-xl">
-                      <View className="flex-row items-center justify-between mb-4">
-                          <View className="flex-row items-center">
-                              <View className="p-1 rounded-full bg-primary/10"><Ionicons name="time-outline" size={18} color="#2563EB" /></View>
-                              <Text className="text-lg font-bold text-[#1E293B] ml-1">
-                                  Store Hours
-                              </Text>
-                          </View>
-                          <TouchableOpacity className="bg-red-100 p-1 rounded-lg" onPress={() => setShowHoursModal(false)}>
-                              <Ionicons name="close" size={20} color="#EF4444" />
-                          </TouchableOpacity>
-                      </View>
-
-                      {laundry.storeHours.map((hour) => (
-                          <View
-                              key={hour.weekday}
-                              className="flex-row items-center justify-between mb-5"
-                          >
-                              <View className="flex-row items-center">
-                                  <Ionicons
-                                      name="calendar-outline"
-                                      size={16}
-                                      color="#64748B"
-                                  />
-                                  <Text className="text-sm text-[#475569] ml-2 w-28">
-                                      {hour.weekday}
-                                  </Text>
-                              </View>
-                              <Text
-                                  className={`text-sm ${hour.time === "Closed"
-                                      ? "text-gray-400 italic"
-                                      : "text-[#1E293B]"
-                                      }`}
-                              >
-                                  {hour.time}
-                              </Text>
-                          </View>
-                      ))}
-                  </View>
-              </View>
-          </Modal>
-    </View>
-  );
+                        <ScrollView showsVerticalScrollIndicator={false}>
+                            {storeHours.map((hour) => (
+                                <View key={hour.weekday} className="flex-row items-center justify-between py-4 border-b border-gray-50">
+                                    <Text className="text-base font-medium text-gray-600">{hour.weekday}</Text>
+                                    <Text className={`text-base font-bold ${hour.time === "Closed" ? "text-red-400" : "text-[#1E293B]"}`}>
+                                        {hour.time}
+                                    </Text>
+                                </View>
+                            ))}
+                        </ScrollView>
+                    </View>
+                </View>
+            </Modal>
+        </View>
+    );
 }

@@ -1,8 +1,6 @@
 import HeaderBackButton from "@/components/common/HeaderBackButton";
-import { Ionicons } from "@expo/vector-icons";
 import { Stack, useRouter, useSegments } from "expo-router";
 import React from "react";
-import { TouchableOpacity } from "react-native";
 
 export default function OrderLayout() {
     const router = useRouter();
